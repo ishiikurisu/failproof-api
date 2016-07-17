@@ -17,5 +17,10 @@ public class Test {
     System.out.println("@ single list");
     System.out.println(web.getList(stuff[0]));
 
+    System.out.println("--- # Extracting pairs");
+    stuff = web.getStuff();
+    for (String it: stuff) {
+      System.out.println(it);
+    }
   }
 }
