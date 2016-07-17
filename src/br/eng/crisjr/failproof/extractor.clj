@@ -1,10 +1,10 @@
 (ns br.eng.crisjr.failproof.extractor
-  (:gen-class))
+    (:gen-class))
 
 (defn extract-lists
-  [stuff]
-  (:lists stuff))
+    [stuff]
+    (:lists stuff))
 
 (defn extract-links
-  [stuff]
-  (:links stuff))
+    [stuff]
+    (:links stuff))

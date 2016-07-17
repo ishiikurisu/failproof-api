@@ -7,7 +7,7 @@
                #^{:static true} [getLinks [] "[Ljava.lang.String;"]
                #^{:static true} [getList [String] "java.lang.String"]])
     (:require [br.eng.crisjr.failproof.fetcher :as fetcher]
-            [br.eng.crisjr.failproof.extractor :as extractor]))
+              [br.eng.crisjr.failproof.extractor :as extractor]))
 
 ;; MAIN FUNCTIONS
 (defn obtain-raw-data
@@ -28,7 +28,7 @@
 (defn get-all-lists
     [stuff]
     (let [lists (extractor/extract-lists stuff)
-        links (extractor/extract-links stuff)]
+          links (extractor/extract-links stuff)]
     (loop [index 0
            limit (count lists)
            box (vector)]
@@ -56,6 +56,8 @@
 (defn -getList
     [link]
     (-> link fetcher/get-list))
+
+;; TODO Create a function to get pairs (List, Link)
 
 (defn -main
     "Let's get a web page for you now"
