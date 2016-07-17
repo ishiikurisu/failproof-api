@@ -5,7 +5,8 @@
                #^{:static true} [getLists [] "[Ljava.lang.String;"]
                #^{:static true} [getLinks [String] "[Ljava.lang.String;"]
                #^{:static true} [getLinks [] "[Ljava.lang.String;"]
-               #^{:static true} [getList [String] "java.lang.String"]])
+               #^{:static true} [getList [String] "java.lang.String"]]
+               #^{:static true} [getStuff [] "[Ljava.lang.String;"])
     (:require [br.eng.crisjr.failproof.fetcher :as fetcher]
               [br.eng.crisjr.failproof.extractor :as extractor]))
 
@@ -39,6 +40,13 @@
                    (conj box (str (nth lists index) "\n"
                                   (fetcher/get-list (nth links index)) "\n")))))))
 
+(defn get-stuff [link]
+    (let [raw-data (obtain-raw-data link)]
+        (let [lists (extract-lists raw-data)
+              links (extract-links raw-data)]
+            (for [i (range (count links))]
+                (str (nth links i) "\n" (nth lists i))))))
+
 ;; INTERFACE
 (def standard-link "https://raw.githubusercontent.com/ishiikurisu/checklists/master/lists.yml")
 (defn -getLists
@@ -58,6 +66,10 @@
     (-> link fetcher/get-list))
 
 ;; TODO Create a function to get pairs (List, Link)
+(defn -getStuff
+    "Let's get stuff done"
+    []
+    (-> standard-link get-stuff into-array))
 
 (defn -main
     "Let's get a web page for you now"
