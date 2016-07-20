@@ -75,11 +75,11 @@
 
 (defn -toLists
     [raw]
-    (geologist/raw-to-lists raw))
+    (-> raw geologist/raw-to-lists into-array))
 
 (defn -toLinks
     [raw]
-    (geologist/raw-to-links raw))
+    (-> raw geologist/raw-to-links into-array))
 
 (defn -main
     "Let's get a web page for you now"

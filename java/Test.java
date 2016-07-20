@@ -22,5 +22,11 @@ public class Test {
     for (String it: stuff) {
       System.out.println(it);
     }
+
+    System.out.println("--- # Turning stuff into useful data");
+    for (String it: web.toLists(stuff)) {
+        System.out.printf("%s ", it);
+    }
+    System.out.println();
   }
 }
