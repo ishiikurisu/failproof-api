@@ -8,10 +8,10 @@
 
 (deftest load-data
   (testing "can it load something?"
-    (is (not (nil? (-> web/standard-link
-                       web/obtain-raw-data
-                       web/extract-lists
-                       into-array))))))
+    (not-nil? (-> web/standard-link
+                  web/obtain-raw-data
+                  web/extract-lists
+                  into-array))))
 
 (deftest load-links
     (testing "can it load links?"
@@ -24,3 +24,25 @@
 (deftest load-stuff
     (testing "can it load stuff?"
         (not-nil? (nth (web/-getStuff) 0))))
+
+(deftest get-lists
+    (testing "turning raw data into lists"
+        (not-nil?
+            (let [lists (web/-toLists (web/-getStuff))]
+                (do (println (reduce #(str %1 " " %2) lists))
+                    lists)
+            )
+        )
+    )
+)
+
+(deftest get-links
+    (testing "turning raw data into lists"
+        (not-nil?
+            (let [lists (web/-toLinks (web/-getStuff))]
+                (do (println (reduce #(str %1 " " %2) lists))
+                    lists)
+            )
+        )
+    )
+)
