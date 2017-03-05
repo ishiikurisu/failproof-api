@@ -19,10 +19,10 @@ Prior version 0.2.0, this API comes with the following methods:
 - `getList`
     - Downloads the given checklist on the API format.
     - Parameter: a String with the machine code
-- `getTitles`
+- `toLists`
     - Turns the id list into a list of titles.
     - Parameter (optional): the id list.
-- `getCodes`
+- `toLinks`
     - Turns the id list into a list of codes.
     - Parameter (optional): the id list.
 

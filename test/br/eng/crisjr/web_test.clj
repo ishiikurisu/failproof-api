@@ -29,7 +29,8 @@
     (testing "turning raw data into lists"
         (not-nil?
             (let [lists (web/-toLists (web/-getStuff))]
-                (do (println (reduce #(str %1 " " %2) lists))
+                (do (println "# turning raw data into lists")
+                    (println (reduce #(str %1 " " %2) lists))
                     lists)
             )
         )
@@ -37,12 +38,21 @@
 )
 
 (deftest get-links
-    (testing "turning raw data into lists"
+    (testing "turning raw data into links"
         (not-nil?
             (let [lists (web/-toLinks (web/-getStuff))]
-                (do (println (reduce #(str %1 " " %2) lists))
+                (do (println "# turning raw data into links")
+                    (println (reduce #(str %1 " " %2) lists))
                     lists)
             )
         )
     )
 )
+
+(deftest get-stuff
+    (testing "what is this get-stuff?"
+        (not-nil?
+            (let [stuff (web/-getStuff)]
+                (do (println "# get stuff")
+                    (println (reduce #(str %1 " " %2) stuff))
+                    stuff)))))

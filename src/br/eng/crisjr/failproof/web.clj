@@ -3,12 +3,9 @@
      :name br.eng.crisjr.failproof.web
      :methods [#^{:static true} [getLists [String] "[Ljava.lang.String;"]
                #^{:static true} [getLists [] "[Ljava.lang.String;"]
-               #^{:static true} [getLinks [String] "[Ljava.lang.String;"]
-               #^{:static true} [getLinks [] "[Ljava.lang.String;"]
                #^{:static true} [getList [String] "java.lang.String"]
                #^{:static true} [toLists ["[Ljava.lang.String;"] "[Ljava.lang.String;"]
                #^{:static true} [toLinks ["[Ljava.lang.String;"] "[Ljava.lang.String;"]
-               #^{:static true} [getStuff [] "[Ljava.lang.String;"]])
     (:require [br.eng.crisjr.failproof.fetcher :as fetcher]
               [br.eng.crisjr.failproof.extractor :as extractor]
               [br.eng.crisjr.failproof.geologist :as geologist]))
