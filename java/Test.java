@@ -7,26 +7,5 @@ public class Test {
     for (String it: stuff) {
       System.out.println(it);
     }
-
-    stuff = web.getLinks();
-    System.out.println("--- # links");
-    for (String it: stuff) {
-      System.out.println(it);
-    }
-
-    System.out.println("--- # single list");
-    System.out.println(web.getList(stuff[0]));
-
-    System.out.println("--- # Extracting pairs");
-    stuff = web.getStuff();
-    for (String it: stuff) {
-      System.out.println(it);
-    }
-
-    System.out.println("--- # Turning stuff into useful data");
-    for (String it: web.toLists(stuff)) {
-        System.out.printf("%s ", it);
-    }
-    System.out.println();
   }
 }

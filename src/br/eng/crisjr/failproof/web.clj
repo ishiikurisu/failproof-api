@@ -56,10 +56,8 @@
 
 ;; INTERFACE TO JAVA
 (defn -getLists
-    ([inlet]
-        (-> inlet get-lists into-array))
-    ([]
-        (-> standard-link -getLists)))
+    ([] (into-array (get-lists)))
+    ([inlet] (into-array (get-stuff inlet))))
 
 (defn -getLinks
     ([inlet]
