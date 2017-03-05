@@ -54,6 +54,9 @@
     "Downloads a list of pairs 'title:code'"
     (get-stuff standard-link))
 
+(defn get-list [link]
+    (fetcher/get-list link))
+
 ;; INTERFACE TO JAVA
 (defn -getLists
     ([] (into-array (get-lists)))
@@ -67,7 +70,7 @@
 
 (defn -getList
     [link]
-    (fetcher/get-list link))
+    (get-list link))
 
 (defn -getStuff
     "Let's get stuff done"

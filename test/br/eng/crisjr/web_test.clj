@@ -20,5 +20,11 @@
             (do (println (reduce #(str %1 " " %2) stuff))
                 stuff)))))
 
+(deftest load-list
+    (testing "can it load a list?"
+        (not-nil? (let [list (web/get-list "apps.yml")]
+            (do (println list)
+                list)))))
+
 ;; JAVA TESTS
 ;; TODO Define Java tests
