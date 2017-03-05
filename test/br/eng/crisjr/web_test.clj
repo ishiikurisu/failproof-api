@@ -27,5 +27,13 @@
                 (println (reduce #(str %1 "-" %2 "\n") "" titles))
                 titles)))))
 
+(deftest lists-to-links
+    (testing "can I turn the id list into a list of links?"
+        (not-nil? (let [stuff (web/get-lists)
+                        links (web/to-links stuff)]
+            (do (println "links:")
+                (println (reduce #(str %1 "-" %2 "\n") "" links))
+                links)))))
+
 ;; JAVA TESTS
 ;; TODO Define Java tests

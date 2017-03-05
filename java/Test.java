@@ -15,6 +15,11 @@ public class Test {
     for (String it: titles) {
       System.out.println(it);
     }
+    String[] links = web.toLinks(stuff);
+    System.out.println("--- # links");
+    for (String it: links) {
+      System.out.println(it);
+    }
     System.out.println("...");
   }
 }

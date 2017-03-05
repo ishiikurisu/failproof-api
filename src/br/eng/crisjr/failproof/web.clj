@@ -39,6 +39,10 @@
     "Turns the id list into a list of titles"
     (geologist/raw-to-lists stuff))
 
+(defn to-links [stuff]
+    "Turns the id list into a list of links"
+    (geologist/raw-to-links stuff))
+
 ;; INTERFACE TO JAVA
 (defn -getLists
     ([] (into-array (get-lists)))
@@ -59,7 +63,7 @@
 
 (defn -toLinks
     [raw]
-    (-> raw geologist/raw-to-links into-array))
+    (into-array (to-links raw)))
 
 (defn -main
     "Let's get a web page for you now"
