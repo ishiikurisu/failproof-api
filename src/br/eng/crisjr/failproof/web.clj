@@ -5,10 +5,13 @@
                #^{:static true} [getLists [] "[Ljava.lang.String;"]
                #^{:static true} [getList [String] "java.lang.String"]
                #^{:static true} [toLists ["[Ljava.lang.String;"] "[Ljava.lang.String;"]
-               #^{:static true} [toLinks ["[Ljava.lang.String;"] "[Ljava.lang.String;"]
+               #^{:static true} [toLinks ["[Ljava.lang.String;"] "[Ljava.lang.String;"]])
     (:require [br.eng.crisjr.failproof.fetcher :as fetcher]
               [br.eng.crisjr.failproof.extractor :as extractor]
               [br.eng.crisjr.failproof.geologist :as geologist]))
+
+;; CONSTANTS
+(def standard-link "https://raw.githubusercontent.com/ishiikurisu/checklists/master/lists.yml")
 
 ;; MAIN FUNCTIONS
 (defn obtain-raw-data
@@ -45,13 +48,16 @@
         (let [lists (extract-lists raw-data)
               links (extract-links raw-data)]
             (for [i (range (count links))]
-                (str (nth links i) "\n" (nth lists i))))))
+                (str (nth lists i) ":" (nth links i))))))
 
-;; INTERFACE
-(def standard-link "https://raw.githubusercontent.com/ishiikurisu/checklists/master/lists.yml")
+(defn get-lists []
+    "Downloads a list of pairs 'title:code'"
+    (get-stuff standard-link))
+
+;; INTERFACE TO JAVA
 (defn -getLists
     ([inlet]
-        (-> inlet obtain-raw-data extract-lists into-array))
+        (-> inlet get-lists into-array))
     ([]
         (-> standard-link -getLists)))
 

@@ -6,6 +6,7 @@
 (defn not-nil? [etwas]
     (is (not (nil? etwas))))
 
+;; CLOJURE TESTS
 (deftest load-data
   (testing "can it load something?"
     (not-nil? (-> web/standard-link
@@ -13,46 +14,11 @@
                   web/extract-lists
                   into-array))))
 
-(deftest load-links
-    (testing "can it load links?"
-        (not-nil? (web/-getLinks))))
+(deftest load-lists
+    (testing "can it load the lists in the correct format?"
+        (not-nil? (let [stuff (web/get-lists)]
+            (do (println (reduce #(str %1 " " %2) stuff))
+                stuff)))))
 
-(deftest load-list
-    (testing "can it load a list from a link?"
-        (not-nil? (web/-getList (nth (web/-getLinks) 0)))))
-
-(deftest load-stuff
-    (testing "can it load stuff?"
-        (not-nil? (nth (web/-getStuff) 0))))
-
-(deftest get-lists
-    (testing "turning raw data into lists"
-        (not-nil?
-            (let [lists (web/-toLists (web/-getStuff))]
-                (do (println "# turning raw data into lists")
-                    (println (reduce #(str %1 " " %2) lists))
-                    lists)
-            )
-        )
-    )
-)
-
-(deftest get-links
-    (testing "turning raw data into links"
-        (not-nil?
-            (let [lists (web/-toLinks (web/-getStuff))]
-                (do (println "# turning raw data into links")
-                    (println (reduce #(str %1 " " %2) lists))
-                    lists)
-            )
-        )
-    )
-)
-
-(deftest get-stuff
-    (testing "what is this get-stuff?"
-        (not-nil?
-            (let [stuff (web/-getStuff)]
-                (do (println "# get stuff")
-                    (println (reduce #(str %1 " " %2) stuff))
-                    stuff)))))
+;; JAVA TESTS
+;; TODO Define Java tests

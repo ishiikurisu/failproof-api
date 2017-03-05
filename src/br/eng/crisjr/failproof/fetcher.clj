@@ -38,7 +38,7 @@
 (defn listify
     [inlet]
     (let [lines (str/split-lines inlet)]
-        (reduce #(str %1 (get-item %2) "\n")
+        (reduce #(str %1 "-" (get-item %2) "\n")
                 (str (-> lines first get-title) "\n")
                 (rest lines))))
 
