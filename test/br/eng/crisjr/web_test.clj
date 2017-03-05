@@ -7,13 +7,6 @@
     (is (not (nil? etwas))))
 
 ;; CLOJURE TESTS
-(deftest load-data
-  (testing "can it load something?"
-    (not-nil? (-> web/standard-link
-                  web/obtain-raw-data
-                  web/extract-lists
-                  into-array))))
-
 (deftest load-lists
     (testing "can it load the lists in the correct format?"
         (not-nil? (let [stuff (web/get-lists)]
@@ -25,6 +18,14 @@
         (not-nil? (let [list (web/get-list "apps.yml")]
             (do (println list)
                 list)))))
+
+(deftest lists-to-titles
+    (testing "can I turn the id list into a list of titles?"
+        (not-nil? (let [stuff (web/get-lists)
+                        titles (web/to-titles stuff)]
+            (do (println "titles:")
+                (println (reduce #(str %1 "-" %2 "\n") "" titles))
+                titles)))))
 
 ;; JAVA TESTS
 ;; TODO Define Java tests

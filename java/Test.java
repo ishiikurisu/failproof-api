@@ -10,6 +10,11 @@ public class Test {
     System.out.println("--- # list");
     String checklist = web.getList("apps.yml");
     System.out.println(checklist);
+    System.out.println("--- # titles");
+    String[] titles = web.toTitles(stuff);
+    for (String it: titles) {
+      System.out.println(it);
+    }
     System.out.println("...");
   }
 }
