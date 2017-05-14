@@ -11,7 +11,7 @@
               [br.eng.crisjr.failproof.geologist :as geologist]))
 
 ;; CONSTANTS
-(def standard-link "https://raw.githubusercontent.com/ishiikurisu/checklists/master/lists.yml")
+(def standard-link "https://failproof-checklists.5apps.com/checklists/lists.yml")
 
 ;; MAIN FUNCTIONS
 (defn obtain-raw-data
