@@ -1,6 +1,6 @@
-(ns br.eng.crisjr.failproof.web
+(ns br.eng.crisjr.failproof.tools
     (:gen-class
-     :name br.eng.crisjr.failproof.web
+     :name br.eng.crisjr.failproof.tools
      :methods [#^{:static true} [getLists [String] "[Ljava.lang.String;"]
                #^{:static true} [getLists [] "[Ljava.lang.String;"]
                #^{:static true} [getList [String] "java.lang.String"]

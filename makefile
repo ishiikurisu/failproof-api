@@ -1,9 +1,13 @@
+default: unittest
+
 try:
 	lein run https://failproof-checklists.5apps.com/checklists/lists.yml
 
-create:
+uberjar:
 	lein uberjar
-	copy target\\uberjar\\br.eng.crisjr.failproof-0.2.1-standalone.jar java\\br.eng.crisjr.failproof.jar
+
+create: uberjar
+	cp target\\uberjar\\br.eng.crisjr.failproof-0.2.2-standalone.jar java\\br.eng.crisjr.failproof.jar
 	cd java
 	make do
 	cd ..
