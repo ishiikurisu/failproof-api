@@ -48,6 +48,10 @@
     "Extracts the title from a checklist in API format."
     (geologist/get-title checklist))
 
+(defn get-items [checklist]
+    "Extracts the item name in a checklist in API format."
+    (geologist/get-items checklist))
+
 ;; INTERFACE TO JAVA
 (defn -getLists
     ([] (into-array (get-lists)))

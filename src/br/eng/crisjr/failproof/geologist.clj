@@ -22,3 +22,8 @@
     "Gets the title from a checklist in API format."
     [checklist]
     (nth (str/split checklist #"\n") 0))
+
+(defn get-items
+    "Extracts the item name in a checklist in API format."
+    [checklist]
+    (rest (str/split checklist #"\n")))
