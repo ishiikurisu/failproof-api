@@ -26,4 +26,4 @@
 (defn get-items
     "Extracts the item name in a checklist in API format."
     [checklist]
-    (rest (str/split checklist #"\n")))
+    (map #(.substring %1 1) (rest (str/split checklist #"\n"))))

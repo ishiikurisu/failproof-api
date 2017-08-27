@@ -37,26 +37,26 @@
 
 (deftest title-from-list
     (testing "can I get the title of checklist in API format?"
-        (= "Essential apps for work" (tools/get-title (tools/get-list "edc.yml")))))
+        (is (= "Everyday Carry" (tools/get-title (tools/get-list "edc.yml"))))))
 
 (deftest items-from-list
     (testing "can I get the items from a checklist?"
-        (loop [n 0
-               outlet true
-               items (tools/get-items (tools/get-list "functionalworkout.yml"))
-               answers '("Jumping jacks"
-                         "Wall sit"
-                         "Push ups"
-                         "Abdominal crunch"
-                         "Step up onto chair"
-                         "Squat"
-                         "Triceps dip on chair"
-                         "Plank"
-                         "High knees running in place"
-                         "Lunge"
-                         "Push up and rotation"
-                         "Side plank")
-                limit (count answers)]
+        (is (loop [n 0
+                   outlet true
+                   items (tools/get-items (tools/get-list "functionalworkout.yml"))
+                   answers '("Jumping jacks"
+                             "Wall sit"
+                             "Push ups"
+                             "Abdominal crunch"
+                             "Step up onto chair"
+                             "Squat"
+                             "Triceps dip on chair"
+                             "Plank"
+                             "High knees running in place"
+                             "Lunge"
+                             "Push up and rotation"
+                             "Side plank")
+                   limit (count answers)]
             (if (= n limit)
                 outlet
                 (recur (+ n 1)
@@ -64,7 +64,4 @@
                                       (nth answers n)))
                        items
                        answers
-                       limit)))))
-
-;; JAVA TESTS
-;; TODO Define Java tests
+                       limit))))))
