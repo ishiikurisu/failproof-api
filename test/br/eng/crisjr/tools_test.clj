@@ -35,5 +35,9 @@
                 (println (reduce #(str %1 "-" %2 "\n") "" links))
                 links)))))
 
+(deftest title-from-list
+    (testing "can I get the title of checklist in API format?"
+        (= "Essential apps for work" (tools/get-title (tools/get-list "edc.yml")))))
+
 ;; JAVA TESTS
 ;; TODO Define Java tests

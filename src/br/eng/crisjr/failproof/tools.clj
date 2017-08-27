@@ -13,35 +13,40 @@
 ;; CONSTANTS
 (def standard-link "https://failproof-checklists.5apps.com/checklists/lists.yml")
 
-;; MAIN FUNCTIONS
+;; AUXILIAR FUNCTIONS
 (defn obtain-raw-data
-    "Let's get the lists on a web page for you"
+    "Let's get the lists on a web page for you."
     [arg]
     (-> arg fetcher/fetch fetcher/parse))
 
 (defn get-stuff [link]
-    "Downloads info from a given link. Expects a "
+    "Downloads info from a given link. Expects a *.yml file name from the webserver."
     (let [raw-data (obtain-raw-data link)]
         (let [lists (extractor/extract-lists raw-data)
               links (extractor/extract-links raw-data)]
             (for [i (range (count links))]
                 (str (nth lists i) ":" (nth links i))))))
 
+;; MAIN FUNCTIONS
 (defn get-lists []
-    "Downloads a list of pairs 'title:code'"
+    "Downloads a list of pairs 'title:code'."
     (get-stuff standard-link))
 
 (defn get-list [link]
-    "Downloads a given checklist to memory"
+    "Downloads a given checklist to memory."
     (fetcher/get-list link))
 
 (defn to-titles [stuff]
-    "Turns the id list into a list of titles"
+    "Turns the id list into a list of titles."
     (geologist/raw-to-lists stuff))
 
 (defn to-links [stuff]
-    "Turns the id list into a list of links"
+    "Turns the id list into a list of links."
     (geologist/raw-to-links stuff))
+
+(defn get-title [checklist]
+    "Extracts the title from a checklist in API format."
+    (geologist/get-title checklist))
 
 ;; INTERFACE TO JAVA
 (defn -getLists

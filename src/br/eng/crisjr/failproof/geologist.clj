@@ -17,3 +17,8 @@
     "turn raw data into links"
     [raw]
     (raw-to-generic raw 1))
+
+(defn get-title
+    "Gets the title from a checklist in API format."
+    [checklist]
+    (nth (str/split checklist #"\n") 0))
