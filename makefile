@@ -1,4 +1,4 @@
-default: unittest
+default: tdd
 
 try:
 	lein run https://failproof-checklists.5apps.com/checklists/lists.yml
@@ -12,5 +12,5 @@ create: uberjar
 	make do
 	cd ..
 
-unittest:
+tdd:
 	lein test
