@@ -65,3 +65,9 @@
                        items
                        answers
                        limit))))))
+
+(deftest checks-from-list
+    (testing "can I get the state of each checklist item?")
+        (is (not (reduce #(or %1 %2)
+                         false
+                         (tools/get-checks (tools/get-list "functionalworkout.yml"))))))

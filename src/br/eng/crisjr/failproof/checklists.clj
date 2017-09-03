@@ -2,6 +2,8 @@
     (:gen-class)
     (:require [clojure.string :as str]))
 
+;; LOW LEVEL CHECKLIST OPERATIONS
+
 (defn parse-loop
     [line lines stuff]
     (if (nil? line)
@@ -44,6 +46,8 @@
     [raw]
     (raw-to-generic raw 1))
 
+;; HIGH LEVEL CHECKLIST OPERATIONS
+
 (defn get-title
     "Gets the title from a checklist in API format."
     [checklist]
@@ -53,3 +57,9 @@
     "Extracts the item name in a checklist in API format."
     [checklist]
     (map #(.substring %1 1) (rest (str/split checklist #"\n"))))
+
+(defn get-checks
+    "Returns an array of booleans representing the checks of the checklist"
+    [checklist]
+    (map #(= \* (nth %1 0))
+         (rest (str/split checklist #"\n"))))

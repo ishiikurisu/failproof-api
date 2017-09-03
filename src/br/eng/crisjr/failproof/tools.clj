@@ -51,6 +51,10 @@
     "Extracts the item name in a checklist in API format."
     (checklists/get-items checklist))
 
+(defn get-checks [checklist]
+    "Extracts the state of the checks in a checklist."
+    (checklists/get-checks checklist))
+
 ;; INTERFACE TO JAVA
 (defn -getLists
     ([] (into-array (get-lists)))
