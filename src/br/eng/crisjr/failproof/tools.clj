@@ -6,9 +6,8 @@
                #^{:static true} [getList [String] "java.lang.String"]
                #^{:static true} [toTitles ["[Ljava.lang.String;"] "[Ljava.lang.String;"]
                #^{:static true} [toLinks ["[Ljava.lang.String;"] "[Ljava.lang.String;"]])
-    (:require [br.eng.crisjr.failproof.fetcher :as fetcher]
-              [br.eng.crisjr.failproof.extractor :as extractor]
-              [br.eng.crisjr.failproof.geologist :as geologist]))
+    (:require [br.eng.crisjr.failproof.requests :as requests]
+              [br.eng.crisjr.failproof.checklists :as checklists]))
 
 ;; CONSTANTS
 (def standard-link "https://failproof-checklists.5apps.com/checklists/lists.yml")
@@ -17,13 +16,13 @@
 (defn obtain-raw-data
     "Let's get the lists on a web page for you."
     [arg]
-    (-> arg fetcher/fetch fetcher/parse))
+    (-> arg requests/fetch checklists/parse))
 
 (defn get-stuff [link]
     "Downloads info from a given link. Expects a *.yml file name from the webserver."
     (let [raw-data (obtain-raw-data link)]
-        (let [lists (extractor/extract-lists raw-data)
-              links (extractor/extract-links raw-data)]
+        (let [lists (checklists/extract-lists raw-data)
+              links (checklists/extract-links raw-data)]
             (for [i (range (count links))]
                 (str (nth lists i) ":" (nth links i))))))
 
@@ -34,23 +33,23 @@
 
 (defn get-list [link]
     "Downloads a given checklist to memory."
-    (fetcher/get-list link))
+    (requests/get-list link))
 
 (defn to-titles [stuff]
     "Turns the id list into a list of titles."
-    (geologist/raw-to-lists stuff))
+    (checklists/raw-to-lists stuff))
 
 (defn to-links [stuff]
     "Turns the id list into a list of links."
-    (geologist/raw-to-links stuff))
+    (checklists/raw-to-links stuff))
 
 (defn get-title [checklist]
     "Extracts the title from a checklist in API format."
-    (geologist/get-title checklist))
+    (checklists/get-title checklist))
 
 (defn get-items [checklist]
     "Extracts the item name in a checklist in API format."
-    (geologist/get-items checklist))
+    (checklists/get-items checklist))
 
 ;; INTERFACE TO JAVA
 (defn -getLists
@@ -74,7 +73,8 @@
     [raw]
     (into-array (to-links raw)))
 
+; IDEA Create a terminal utility for this thing.
 (defn -main
-    "Let's get a web page for you now"
+    "Don't run it!"
     [& args]
     (-> args (nth 0) obtain-raw-data println))

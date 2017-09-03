@@ -1,8 +1,7 @@
-(ns br.eng.crisjr.failproof.fetcher
+(ns br.eng.crisjr.failproof.checklists
     (:gen-class)
     (:require [clojure.string :as str]))
 
-;; Initial fetch
 (defn parse-loop
     [line lines stuff]
     (if (nil? line)
@@ -21,29 +20,36 @@
     (let [lines (str/split-lines yaml)]
         (parse-loop (first lines) (rest lines) {:lists (vector) :links (vector)})))
 
-(defn fetch
-    "Gets the html from the chosen address"
-    [source]
-    (slurp source))
+(defn extract-lists
+    [stuff]
+    (:lists stuff))
 
-;; List fetch
+(defn extract-links
+    [stuff]
+    (:links stuff))
+
+(defn raw-to-generic
+    [raw index]
+    (->> raw
+         (map #(str/split %1 #":"))
+         (map #(nth %1 index))))
+
+(defn raw-to-lists
+    "turn raw data into lists"
+    [raw]
+    (raw-to-generic raw 0))
+
+(defn raw-to-links
+    "turn raw data into links"
+    [raw]
+    (raw-to-generic raw 1))
+
 (defn get-title
-    [inlet]
-    (subs inlet 0 (-> inlet count dec)))
+    "Gets the title from a checklist in API format."
+    [checklist]
+    (nth (str/split checklist #"\n") 0))
 
-(defn get-item
-    [inlet]
-    (subs inlet 2 (count inlet)))
-
-(defn listify
-    [inlet]
-    (let [lines (str/split-lines inlet)]
-        (reduce #(str %1 "-" (get-item %2) "\n")
-                (str (-> lines first get-title) "\n")
-                (rest lines))))
-
-(defn get-list
-    [link]
-    (-> (str "https://failproof-checklists.5apps.com/checklists/" link)
-        fetch
-        listify))
+(defn get-items
+    "Extracts the item name in a checklist in API format."
+    [checklist]
+    (map #(.substring %1 1) (rest (str/split checklist #"\n"))))
