@@ -55,6 +55,10 @@
     "Extracts the state of the checks in a checklist."
     (checklists/get-checks checklist))
 
+(defn set-check [checklist n state]
+    "Sets the value on a checklist item"
+    (checklists/set-check checklist n state))
+
 ;; INTERFACE TO JAVA
 (defn -getLists
     ([] (into-array (get-lists)))

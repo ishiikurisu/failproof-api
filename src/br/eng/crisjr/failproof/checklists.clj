@@ -63,3 +63,24 @@
     [checklist]
     (map #(= \* (nth %1 0))
          (rest (str/split checklist #"\n"))))
+
+(defn set-check [checklist where what]
+    "Sets the value on a checklist item"
+    (let [title (get-title checklist)
+          items (get-items checklist)
+          checks (get-checks checklist)]
+         (reduce #(str %1 %2 "\n")
+                 (str title "\n")
+                 (loop [n 0
+                        limit (count checks)
+                        box (vector)]
+                       (if (= n limit)
+                           box
+                           (recur (+ n 1)
+                                  limit
+                                  (conj box (str (if (= true
+                                                        (if (= where n)
+                                                            what
+                                                            (nth checks n)))
+                                                     "*" "-")
+                                                 (nth items n)))))))))

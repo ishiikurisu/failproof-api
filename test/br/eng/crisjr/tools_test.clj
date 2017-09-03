@@ -71,3 +71,15 @@
         (is (not (reduce #(or %1 %2)
                          false
                          (tools/get-checks (tools/get-list "functionalworkout.yml"))))))
+
+(deftest checks-to-list
+    (testing "can I set the state of each checklist item?"
+        (is (let [old-checklist (tools/get-list "functionalworkout.yml")
+                  old-checks (tools/get-checks old-checklist)
+                  new-checklist (tools/set-check old-checklist 2 true)
+                  new-checks (tools/get-checks new-checklist)]
+                 (do (println new-checklist)
+                     (reduce #(or %1 (not (= (nth old-checks %2)
+                                             (nth new-checks %2))))
+                             false
+                             (range 0 (count old-checks))))))))
