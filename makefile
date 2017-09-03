@@ -7,7 +7,7 @@ uberjar:
 	lein uberjar
 
 create: uberjar
-	cp target\\uberjar\\br.eng.crisjr.failproof-0.2.2-standalone.jar java\\br.eng.crisjr.failproof.jar
+	cp target\\uberjar\\br.eng.crisjr.failproof-0.2.3-standalone.jar java\\br.eng.crisjr.failproof.jar
 	cd java
 	make do
 	cd ..

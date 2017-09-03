@@ -20,6 +20,12 @@ public class Test {
     for (String it: links) {
       System.out.println(it);
     }
+    System.out.println("--- # Checks");
+    System.out.println("Before:");
+    System.out.println(checklist);
+    checklist = tools.setCheck(checklist, 2, true);
+    System.out.println("After:");
+    System.out.println(tools.setCheck(checklist, 2, true));
     System.out.println("...");
   }
 }

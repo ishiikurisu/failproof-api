@@ -5,7 +5,11 @@
                #^{:static true} [getLists [] "[Ljava.lang.String;"]
                #^{:static true} [getList [String] "java.lang.String"]
                #^{:static true} [toTitles ["[Ljava.lang.String;"] "[Ljava.lang.String;"]
-               #^{:static true} [toLinks ["[Ljava.lang.String;"] "[Ljava.lang.String;"]])
+               #^{:static true} [toLinks ["[Ljava.lang.String;"] "[Ljava.lang.String;"]
+               #^{:static true} [getTitle [String] String]
+               #^{:static true} [getItems [String] "[Ljava.lang.String;"]
+               #^{:static true} [getChecks [String] "[Ljava.lang.Boolean;"]
+               #^{:static true} [setCheck [String Integer Boolean] String]])
     (:require [br.eng.crisjr.failproof.requests :as requests]
               [br.eng.crisjr.failproof.checklists :as checklists]))
 
@@ -80,6 +84,22 @@
 (defn -toLinks
     [raw]
     (into-array (to-links raw)))
+
+(defn -getTitle
+    [checklist]
+    (get-title checklist))
+
+(defn -getItems
+    [checklist]
+    (-> checklist get-items into-array))
+
+(defn -getChecks
+    [checklist]
+    (-> checklist get-checks into-array))
+
+(defn -setCheck
+    [checklist where what]
+    (set-check checklist where what))
 
 ; IDEA Create a terminal utility for this thing.
 (defn -main
