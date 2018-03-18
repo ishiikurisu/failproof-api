@@ -14,7 +14,7 @@
               [br.eng.crisjr.failproof.checklists :as checklists]))
 
 ;; CONSTANTS
-(def standard-link "https://failproof-checklists.5apps.com/checklists/lists.yml")
+(def standard-link "https://raw.githubusercontent.com/ishiikurisu/checklists/master/lists.yml")
 
 ;; AUXILIAR FUNCTIONS
 (defn obtain-raw-data

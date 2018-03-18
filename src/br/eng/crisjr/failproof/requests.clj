@@ -24,6 +24,6 @@
 
 (defn get-list
     [link]
-    (-> (str "https://failproof-checklists.5apps.com/checklists/" link)
+    (-> (str "https://raw.githubusercontent.com/ishiikurisu/checklists/master/" link)
         fetch
         listify))

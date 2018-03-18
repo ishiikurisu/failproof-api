@@ -1,7 +1,7 @@
 default: tdd
 
 try:
-	lein run https://failproof-checklists.5apps.com/checklists/lists.yml
+	lein run https://github.com/ishiikurisu/checklists/blob/master/lists.yml
 
 uberjar:
 	lein uberjar

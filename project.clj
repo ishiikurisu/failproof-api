@@ -1,4 +1,4 @@
-(defproject br.eng.crisjr.failproof "0.2.3"
+(defproject br.eng.crisjr.failproof "0.2.4"
     :description "API for Failproof Checklists"
     :url "http://wwww.crisjr.eng.br"
     :license {:name "Beerware 42"
