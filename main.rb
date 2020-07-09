@@ -1,5 +1,7 @@
 require 'sinatra'
 
 get '/' do
-  "Hello World!"
+  return {
+    "data" => "Hello World!",
+  }.to_json
 end
