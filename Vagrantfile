@@ -4,6 +4,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    apt-get install -y nginx postgresql postgresql-client git
+    apt-get upgrade
+    apt-get install -y nginx postgresql postgresql-client git postgres-server-dev-9.3
   SHELL
 end
