@@ -1,5 +1,6 @@
 require 'pg'
 require 'jwt'
+require 'digest'
 
 class Database
   attr_reader :create_tables_sql
@@ -27,7 +28,7 @@ class Database
   def create_user username, password, notes
     create_user_sql = @sql['create_user'] % {
       :username => username,
-      :password => password,
+      :password => hide(password),
       :notes => (notes == nil)? "" : notes,
     }
     result = @conn.exec create_user_sql
@@ -43,7 +44,7 @@ class Database
   def auth_user username, password
     auth_user_sql = @sql['auth_user'] % {
       :username => username,
-      :password => password,
+      :password => hide(password),
     }
     
     user_id = nil
@@ -65,5 +66,10 @@ class Database
   
   def setup
     @conn.exec @sql['create_tables']
+  end
+  
+  def hide password
+    # TODO improve this encryption with salt and cooking time
+    Digest::RMD160.hexdigest password
   end
 end
