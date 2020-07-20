@@ -35,8 +35,9 @@ class Database
     result.each_row do |row|
       user_id = row[0]
     end
-    auth_key = {:user_id => user_id}
-    JWT.encode auth_key, 'random_secret', 'HS256'
+    return {
+      "auth_key"  => (user_id == nil)? nil : JWT.encode({:user_id => user_id}, 'random_secret', 'HS256'),
+    }
   end
   
   def auth_user username, password
@@ -52,10 +53,8 @@ class Database
       notes = row[4]
     end
     
-    auth_key = (user_id == nil)? nil : JWT.encode({:user_id => user_id}, 'random_secret', 'HS256')
-      
     return {
-      "auth_key" => auth_key,
+      "auth_key" => (user_id == nil)? nil : JWT.encode({:user_id => user_id}, 'random_secret', 'HS256'),
       "notes" => notes,
     }
   end
