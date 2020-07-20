@@ -94,4 +94,10 @@ This is what I need to do
     result_notes = JSON.parse(last_response.body)["notes"]
     assert expected_notes == result_notes
   end
+  
+  def test_hide_password
+    password = "some random string"
+    encrypted = $db.hide password
+    assert password != encrypted
+  end
 end
