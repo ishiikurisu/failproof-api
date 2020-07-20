@@ -15,8 +15,8 @@ end
 
 post '/users/create' do
   data = JSON.parse request.body.read
-  auth_key = $db.create_user data['username'], data['password'], data['notes']
-  return {"auth_key" => auth_key}.to_json
+  payload = $db.create_user data['username'], data['password'], data['notes']
+  return payload.to_json
 end
 
 post '/users/auth' do
