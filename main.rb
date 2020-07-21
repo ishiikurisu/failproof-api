@@ -31,5 +31,8 @@ get '/notes' do
   return payload.to_json
 end
 
-# TODO implement route to get notes from a user
-# TODO implement route to update notes from a user
+post '/notes' do
+  data = JSON.parse request.body.read
+  payload = $db.update_notes data['auth_key'], data['notes']
+  return payload.to_json
+end
