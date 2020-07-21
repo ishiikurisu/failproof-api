@@ -76,6 +76,23 @@ class Database
     }
   end
 
+  def update_notes auth_key, notes
+    user_data = decode_auth_key auth_key
+
+    update_notes_sql = @sql['update_notes'] % {
+      :id => user_data[0]["user_id"],
+      :notes => notes,
+    }
+    oops = "It wasn't possible to perform this operation"
+    @conn.exec(update_notes_sql).each_row do |row|
+      oops = nil
+    end
+
+    return {
+      "error" => oops,
+    }
+  end
+
   def drop
     @conn.exec "DROP TABLE users;"
   end
@@ -90,6 +107,7 @@ class Database
   end
 
   def encode_auth_key user_data
+    # TODO improve the secret for authorization tokens token
     JWT.encode user_data, 'random_secret', 'HS256'
   end
 
