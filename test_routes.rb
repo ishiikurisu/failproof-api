@@ -123,4 +123,36 @@ This is what I need to do
     result_notes = JSON.parse(last_response.body)["notes"]
     assert expected_notes == result_notes
   end
+
+  def test_update_checklists
+    # user does not exist
+    $db.drop
+    $db.setup
+    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.OiHSk5Cl2k7cxj2yhsNuEHtjBdAc3PbJk3X6rl4ROZ0"
+    new_notes = %Q(# My first checklist
+This is what I need to do
+- [x] This is a done item
+- [x] This item is still pending
+)
+    data = {
+      "auth_key" => auth_key,
+      "notes" => new_notes,
+    }
+    post '/notes', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    result = JSON.parse(last_response.body)["error"]
+    assert result != nil
+
+    # existing user
+    test_create_user_with_notes
+    post '/notes', data.to_json, "CONTENT_TYPE" => "application/json"
+    result_notes = JSON.parse(last_response.body)["error"]
+    result = JSON.parse(last_response.body)["error"]
+    assert result == nil
+
+    get "/notes?auth_key=#{auth_key}"
+    assert last_response.ok?
+    result_notes = JSON.parse(last_response.body)["notes"]
+    assert new_notes == result_notes
+  end
 end
