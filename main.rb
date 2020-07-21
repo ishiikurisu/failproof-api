@@ -24,3 +24,12 @@ post '/users/auth' do
   payload = $db.auth_user data['username'], data['password']
   return payload.to_json
 end
+
+get '/notes' do
+  auth_key = params['auth_key']
+  payload = $db.get_notes auth_key
+  return payload.to_json
+end
+
+# TODO implement route to get notes from a user
+# TODO implement route to update notes from a user

@@ -13,7 +13,7 @@ class Database
     password = dboptions['password']
     tty = nil
     options = nil
-    
+
     @sql = {}
     Dir["#{sql_folder}/*.sql"].each do |fn|
       File.open(fn) do |fp|
@@ -37,39 +37,63 @@ class Database
       user_id = row[0]
     end
     return {
-      "auth_key"  => (user_id == nil)? nil : JWT.encode({:user_id => user_id}, 'random_secret', 'HS256'),
+      "auth_key"  => (user_id == nil)? nil : encode_auth_key({:user_id => user_id}),
     }
   end
-  
+
   def auth_user username, password
     auth_user_sql = @sql['auth_user'] % {
       :username => username,
       :password => hide(password),
     }
-    
+
     user_id = nil
     notes = nil
     @conn.exec(auth_user_sql).each_row do |row|
       user_id = row[0]
       notes = row[4]
     end
-    
+
     return {
-      "auth_key" => (user_id == nil)? nil : JWT.encode({:user_id => user_id}, 'random_secret', 'HS256'),
+      "auth_key" => (user_id == nil)? nil : encode_auth_key({:user_id => user_id}),
       "notes" => notes,
     }
   end
-  
+
+  def get_notes auth_key
+    user_data = decode_auth_key auth_key
+
+    get_notes_sql = @sql['get_notes'] % {
+      :id => user_data[0]["user_id"],
+    }
+    notes = nil
+    @conn.exec(get_notes_sql).each_row do |row|
+      notes = row[4]
+    end
+
+    return {
+      "notes" => notes,
+    }
+  end
+
   def drop
     @conn.exec "DROP TABLE users;"
   end
-  
+
   def setup
     @conn.exec @sql['create_tables']
   end
-  
+
   def hide password
     # TODO improve this encryption with salt and cooking time
     Digest::RMD160.hexdigest password
+  end
+
+  def encode_auth_key user_data
+    JWT.encode user_data, 'random_secret', 'HS256'
+  end
+
+  def decode_auth_key auth_key
+    JWT.decode auth_key, 'random_secret', 'HS256'
   end
 end
