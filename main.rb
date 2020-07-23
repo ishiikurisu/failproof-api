@@ -3,10 +3,16 @@ require 'json'
 require './db/db.rb'
 
 # SETUP
-File.open('./.config/options.json') do |file|
-  $options = JSON.parse file.read
+if ENV['DATABASE_URL'] and ENV['SALT']
+  $db = Database.new({
+    "database_url" => ENV['DATABASE_URL'],
+    "salt" => ENV['SALT'],
+  }, "./db/sql")
+else
+  File.open('./.config/options.json') do |file|
+    $db = Database.new(JSON.parse(file.read), "./db/sql")
+  end
 end
-$db = Database.new $options, "./db/sql"
 
 # ROUTES
 post '/users/create' do
