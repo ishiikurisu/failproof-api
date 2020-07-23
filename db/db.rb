@@ -20,6 +20,8 @@ class Database
         @sql[fn.split("/")[-1].chomp(".sql")] = fp.read
       end
     end
+      
+    @salt = dboptions['salt']
 
     @conn = PG.connect(host, port, options, tty, dbname, user, password)
     setup
@@ -102,16 +104,18 @@ class Database
   end
 
   def hide password
-    # TODO improve this encryption with salt and cooking time
-    Digest::RMD160.hexdigest password
+    outlet = password
+    1000.times do
+      outlet = Digest::RMD160.hexdigest(outlet + @salt)
+    end
+    return outlet
   end
 
   def encode_auth_key user_data
-    # TODO improve the secret for authorization tokens token
-    JWT.encode user_data, 'random_secret', 'HS256'
+    JWT.encode user_data, @salt, 'HS256'
   end
 
   def decode_auth_key auth_key
-    JWT.decode auth_key, 'random_secret', 'HS256'
+    JWT.decode auth_key, @salt, 'HS256'
   end
 end

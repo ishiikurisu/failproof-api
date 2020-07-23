@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'rack/test'
 require 'test/unit'
+require 'pry'
 require './main'
 
 class MainRoutesTest < Test::Unit::TestCase
@@ -22,7 +23,7 @@ class MainRoutesTest < Test::Unit::TestCase
     post '/users/create', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
 
-    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.OiHSk5Cl2k7cxj2yhsNuEHtjBdAc3PbJk3X6rl4ROZ0"
+    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
     result_auth_key = JSON.parse(last_response.body)["auth_key"]
     assert expected_auth_key == result_auth_key
 
@@ -57,7 +58,7 @@ class MainRoutesTest < Test::Unit::TestCase
     post '/users/auth', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
 
-    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.OiHSk5Cl2k7cxj2yhsNuEHtjBdAc3PbJk3X6rl4ROZ0"
+    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
     result_auth_key = JSON.parse(last_response.body)["auth_key"]
     assert expected_auth_key == result_auth_key
 
@@ -67,6 +68,7 @@ class MainRoutesTest < Test::Unit::TestCase
   end
 
   def test_create_user_with_notes
+    # binding.pry for debugging purposes
     $db.drop
     $db.setup
 
@@ -84,7 +86,7 @@ This is what I need to do
     post '/users/create', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
 
-    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.OiHSk5Cl2k7cxj2yhsNuEHtjBdAc3PbJk3X6rl4ROZ0"
+    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
     result_auth_key = JSON.parse(last_response.body)["auth_key"]
     assert expected_auth_key == result_auth_key
 
@@ -105,7 +107,7 @@ This is what I need to do
     # user does not exist
     $db.drop
     $db.setup
-    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.OiHSk5Cl2k7cxj2yhsNuEHtjBdAc3PbJk3X6rl4ROZ0"
+    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
     get "/notes?auth_key=#{auth_key}"
     assert last_response.ok?
     result_notes = JSON.parse(last_response.body)["notes"]
@@ -128,7 +130,8 @@ This is what I need to do
     # user does not exist
     $db.drop
     $db.setup
-    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.OiHSk5Cl2k7cxj2yhsNuEHtjBdAc3PbJk3X6rl4ROZ0"
+    # TODO include a test which this token's secret does not match ours
+    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
     new_notes = %Q(# My first checklist
 This is what I need to do
 - [x] This is a done item
@@ -145,6 +148,16 @@ This is what I need to do
 
     # existing user
     test_create_user_with_notes
+    get "/notes?auth_key=#{auth_key}"
+    assert last_response.ok?
+    result_notes = JSON.parse(last_response.body)["notes"]
+    old_notes = %Q(# My first checklist
+This is what I need to do
+- [x] This is a done item
+- [ ] This item is still pending
+)
+    assert old_notes == result_notes
+    
     post '/notes', data.to_json, "CONTENT_TYPE" => "application/json"
     result_notes = JSON.parse(last_response.body)["error"]
     result = JSON.parse(last_response.body)["error"]
