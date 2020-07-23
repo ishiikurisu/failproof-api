@@ -9,30 +9,21 @@ end
 $db = Database.new $options, "./db/sql"
 
 # ROUTES
-get '/' do
-  $options.to_json
-end
-
 post '/users/create' do
   data = JSON.parse request.body.read
-  payload = $db.create_user data['username'], data['password'], data['notes']
-  return payload.to_json
+  $db.create_user(data['username'], data['password'], data['notes']).to_json
 end
 
 post '/users/auth' do
   data = JSON.parse request.body.read
-  payload = $db.auth_user data['username'], data['password']
-  return payload.to_json
+  $db.auth_user(data['username'], data['password']).to_json
 end
 
 get '/notes' do
-  auth_key = params['auth_key']
-  payload = $db.get_notes auth_key
-  return payload.to_json
+  $db.get_notes(params['auth_key']).to_json
 end
 
 post '/notes' do
   data = JSON.parse request.body.read
-  payload = $db.update_notes data['auth_key'], data['notes']
-  return payload.to_json
+  $db.update_notes(data['auth_key'], data['notes']).to_json
 end
