@@ -1,18 +1,25 @@
 require 'pg'
 require 'jwt'
 require 'digest'
+require 'uri'
 
 class Database
   attr_reader :create_tables_sql
 
   def initialize dboptions, sql_folder
-    host = dboptions['host']
-    port = dboptions['port']
-    dbname = dboptions['dbname']
-    user = dboptions['user']
-    password = dboptions['password']
-    tty = nil
-    options = nil
+    if dboptions.has_key? 'database_url'
+      uri = URI.parse(ENV['DATABASE_URL'])
+      @conn = PG.connect(uri.hostname, uri.port, nil, nil, uri.path[1..-1], uri.user, uri.password)
+    else
+      host = dboptions['host']
+      port = dboptions['port']
+      dbname = dboptions['dbname']
+      user = dboptions['user']
+      password = dboptions['password']
+      tty = nil
+      options = nil
+      @conn = PG.connect(host, port, options, tty, dbname, user, password)
+    end
 
     @sql = {}
     Dir["#{sql_folder}/*.sql"].each do |fn|
@@ -23,7 +30,6 @@ class Database
       
     @salt = dboptions['salt']
 
-    @conn = PG.connect(host, port, options, tty, dbname, user, password)
     setup
   end
 
