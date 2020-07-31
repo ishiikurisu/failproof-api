@@ -15,9 +15,21 @@ else
 end
 
 # ROUTES
+post '/export' do
+  data = JSON.parse request.body.read
+  $db.export(data['auth_key']).to_json
+end
+
+post '/import' do
+  data = JSON.parse request.body.read
+  $db.import(data['auth_key'], data['database']).to_json
+end
+
+# TODO implement route to sync a user's notes
+
 post '/users/create' do
   data = JSON.parse request.body.read
-  $db.create_user(data['username'], data['password'], data['notes']).to_json
+  $db.create_user(data['username'], data['password'], false, data['notes']).to_json
 end
 
 post '/users/auth' do
