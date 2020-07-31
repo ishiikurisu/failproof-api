@@ -54,6 +54,31 @@ The API comes with the following HTTP methods:
     - `notes`: Markdown or `null`
   - Returns:
     - `error`: `string` or `null`
+- `/sync`
+  - Sync the notes from user
+  - Method: `POST`
+  - Parameters:
+    - `auth_key`: `string`
+    - `notes`: Markdown or `null`
+    - `last_updated`: timestamp
+  - Returns:
+    - `notes`: the most up to date version of the notes
+    - `timestamp`: the date of the last update
+- `/export`
+  - Exports database
+  - Method: `POST`
+  - Parameters:
+    - `auth_key`: `string`
+  - Returns:
+    - `database`: `string` or `null`
+- `/import`
+  - Imports database
+  - Method: `POST`
+  - Parameters:
+    - `auth_key`: `string`
+    - `database`: `string`
+  - Returns:
+    - `error`: `string` or `null`
 
 # Acknoledgements
 
