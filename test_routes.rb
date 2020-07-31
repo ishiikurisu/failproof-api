@@ -157,7 +157,7 @@ This is what I need to do
 - [ ] This item is still pending
 )
     assert old_notes == result_notes
-    
+
     post '/notes', data.to_json, "CONTENT_TYPE" => "application/json"
     result_notes = JSON.parse(last_response.body)["error"]
     result = JSON.parse(last_response.body)["error"]
@@ -167,5 +167,102 @@ This is what I need to do
     assert last_response.ok?
     result_notes = JSON.parse(last_response.body)["notes"]
     assert new_notes == result_notes
+  end
+
+  def test_export_database
+    $db.drop
+    $db.setup
+
+    # populating database
+    admin_user_payload = $db.create_user "joe", "password", true, nil
+    admin_auth_key = admin_user_payload['auth_key']
+
+    users = [
+      {
+        "username" => "mira",
+        "password" => "123456",
+        "notes" => %Q(# My first checklist
+This is what I need to do
+- [x] This is a done item
+- [ ] This item is still pending
+),
+      }, {
+        "username" => "pietro",
+        "password" => "789101",
+        "notes" => '# Famous people',
+      }, {
+        "username" => "flora",
+        "password" => "andes song",
+        "notes" => nil,
+      },
+    ]
+
+    users.each do |u|
+      $db.create_user u['username'], u['password'], false, u['notes']
+    end
+
+    # exporting database
+    data = {
+      "auth_key" => admin_auth_key,
+    }
+    post '/export', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+
+    # checking if exported data is correct
+    expected = [
+        ["id", "username", "password", "admin", "notes"],
+        [1, "joe", $db.hide("password"), true, ""],
+    ]
+    users.each_index do |i|
+      u = users[i]
+      expected << [i + 2, u['username'], $db.hide(u['password']), false, u['notes'] || ""]
+    end
+    result = JSON.parse(last_response.body)["database"]
+    assert expected == result
+  end
+
+  def test_import_database
+    # preparing database
+    $db.drop
+    $db.setup
+    admin_user_payload = $db.create_user "joe", "password", true, nil
+    admin_auth_key = admin_user_payload['auth_key']
+
+    # checking is database is correct before import
+    database = [
+        ["id", "username", "password", "admin", "notes"],
+        [1, "joe", "981a32f2bd2b8d65b4f23c90be8a7bd99cfe8d61", true, ""],
+    ]
+    data = {
+      "auth_key" => admin_auth_key,
+    }
+    post '/export', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    assert database == JSON.parse(last_response.body)["database"]
+
+    # importing database
+    database = [
+      ["id", "username", "password", "admin", "notes"],
+      [1, "joe", "981a32f2bd2b8d65b4f23c90be8a7bd99cfe8d61", true, ""],
+      [2, "mira", "4bc477c6ae1695066e3f26d8454af9a882839d9c", false, "# My first checklist\nThis is what I need to do\n- [x] This is a done item\n- [ ] This item is still pending\n"],
+      [3, "pietro", "450624ea8c301011394c325a92652e888d0abfc6", false, "# Famous people"],
+      [4, "flora", "e592ea6f709ab906042f1323d61920a928948803", false, ""],
+    ]
+    data = {
+      "auth_key" => admin_auth_key,
+      "database" => database,
+    }
+    post '/import', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    assert JSON.parse(last_response.body)["error"] == nil
+
+    # checking if imported database is correct
+    data = {
+      "auth_key" => admin_auth_key,
+    }
+    post '/export', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    result = JSON.parse(last_response.body)["database"]
+    assert database == result
   end
 end

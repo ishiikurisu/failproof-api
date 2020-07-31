@@ -27,17 +27,18 @@ class Database
         @sql[fn.split("/")[-1].chomp(".sql")] = fp.read
       end
     end
-      
+
     @salt = dboptions['salt']
 
     setup
   end
 
-  def create_user username, password, notes
+  def new_user username, password, admin, notes
     create_user_sql = @sql['create_user'] % {
       :username => username,
-      :password => hide(password),
+      :password => password,
       :notes => (notes == nil)? "" : notes,
+      :admin => (admin)? 'on' : 'off',
     }
     result = @conn.exec create_user_sql
     user_id = nil
@@ -47,6 +48,10 @@ class Database
     return {
       "auth_key"  => (user_id == nil)? nil : encode_auth_key({:user_id => user_id}),
     }
+  end
+
+  def create_user username, password, admin, notes
+    new_user username, hide(password), admin, notes
   end
 
   def auth_user username, password
@@ -107,6 +112,51 @@ class Database
 
   def setup
     @conn.exec @sql['create_tables']
+  end
+
+  def is_user_admin user_id
+    is_admin = false
+
+    @conn.exec(@sql['get_notes'] % {
+      :id => user_id,
+    }).each_row do |row|
+      is_admin = row[3] == 't'
+    end
+
+    return is_admin
+  end
+
+  def export auth_key
+    user_data = decode_auth_key(auth_key)[0]
+    outlet = nil
+
+    if is_user_admin user_data['user_id']
+       outlet = [["id", "username", "password", "admin", "notes"]]
+       @conn.exec(@sql['export_users']).each_row do |row|
+         outlet << [row[0].to_i, row[1], row[2], row[3] == 't', row[4]]
+      end
+    end
+
+    return {
+      "database" => outlet
+    }
+  end
+
+  def import auth_key, database
+    user_data = decode_auth_key(auth_key)[0]
+    oops = nil
+
+    if is_user_admin user_data['user_id']
+       fields = database[0]
+       rows = database[1...]
+       rows.each do |row|
+         new_user(*row[1...])
+       end
+    end
+
+    return {
+      "error" => oops
+    }
   end
 
   def hide password
