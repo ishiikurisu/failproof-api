@@ -4,7 +4,7 @@ default:
 test:
 	ruby test_routes.rb
 
-import-import:
+import-database:
 	ruby tasks.rb i db.jsonl
 
 export-database:
