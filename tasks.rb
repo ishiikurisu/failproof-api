@@ -27,13 +27,18 @@ def export_database admin_token, database_file
 end
 
 def import_database admin_token, database_file
-  # TODO laod database file
-  database = nil
+  database = []
+  File.readlines(database_file).each do |line|
+    database << JSON.parse(line.chomp)
+  end
   response = post "https://fpcl.herokuapp.com/import", {
     'auth_key' =>  admin_token,
     'database' => database,
   }
-  p response
+  payload = JSON.parse response.body
+  if payload.has_key? 'error' and payload['error'] != nil
+    puts payload['error']
+  end
 end
 
 if $0 == __FILE__
