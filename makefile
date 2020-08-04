@@ -3,3 +3,9 @@ default:
 
 test:
 	ruby test_routes.rb
+
+import-import:
+	ruby tasks.rb i db.jsonl
+
+export-database:
+	ruby tasks.rb e db.jsonl
