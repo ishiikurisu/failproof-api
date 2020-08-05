@@ -157,10 +157,17 @@ class Database
 
   def reset auth_key
     user_data = decode_auth_key(auth_key)[0]
+    oops = "user not authorized"
+
     if is_user_admin user_data['user_id']
       drop
       setup
+      oops = nil
     end
+
+    return {
+      "error" => oops,
+    }
   end
 
   def export auth_key
