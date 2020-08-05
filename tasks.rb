@@ -41,6 +41,10 @@ def import_database admin_token, database_file
   end
 end
 
+def reset_database admin_token
+  post "https://fpcl.herokuapp.com/reset", {'auth_key' =>  admin_token}
+end
+
 if $0 == __FILE__
   admin_token = nil
   File.open('./.config/options.json') do |file|
@@ -51,5 +55,7 @@ if $0 == __FILE__
     export_database admin_token, ARGV[1]
   when "i"  # import
     import_database admin_token, ARGV[1]
+when "r"  # reset
+    reset_database admin_token
   end
 end
