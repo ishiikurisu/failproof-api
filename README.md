@@ -63,7 +63,7 @@ The API comes with the following HTTP methods:
     - `last_updated`: timestamp
   - Returns:
     - `notes`: the most up to date version of the notes
-    - `timestamp`: the date of the last update
+    - `last_updated`: the date of the last update
 - `/export`
   - Exports database
   - Method: `POST`
