@@ -265,4 +265,48 @@ This is what I need to do
     result = JSON.parse(last_response.body)["database"]
     assert database == result
   end
+    
+  def test_sync_notes
+    $db.drop
+    $db.setup
+    
+    old_notes = %Q(# My first checklist
+This is what I need to do
+- [x] This is a done item
+- [ ] This item is still pending
+)
+    new_notes = %Q(# My first checklist
+This is what I need to do
+- [x] This is a done item
+- [x] This item is still pending
+)
+    
+    user_payload = $db.create_user "joe", "password", false, old_notes
+    auth_key = user_payload["auth_key"]
+    
+    data = {
+      "auth_key" => auth_key,
+      "notes" => new_notes,
+      "last_updated" => (Time.now + (5 * 60)).to_i,  # now + 5 minutes
+    }
+    post "/sync", data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    payload = JSON.parse(last_response.body)
+    result_notes = payload["notes"]
+    assert result_notes == new_notes
+    expected_last_updated = payload["last_updated"]
+    
+    data = {
+      "auth_key" => auth_key,
+      "notes" => old_notes,
+      "last_updated" => (Time.now - (5 * 60)).to_i,  # now - 5 minutes
+    }
+    post "/sync", data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    payload = JSON.parse(last_response.body)
+    result_notes = payload["notes"]
+    result_last_updated = payload["last_updated"]
+    assert result_notes == new_notes
+    assert expected_last_updated == result_last_updated
+  end
 end

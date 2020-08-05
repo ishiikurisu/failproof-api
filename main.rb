@@ -25,7 +25,16 @@ post '/import' do
   $db.import(data['auth_key'], data['database']).to_json
 end
 
-# TODO implement route to sync a user's notes
+post '/sync' do
+  data = JSON.parse request.body.read
+  $db.sync(data['auth_key'], data['notes'], data['last_updated'].to_i).to_json
+end
+
+get '/now' do
+  return {
+    "now" => Time.now.to_i
+  }.to_json
+end
 
 post '/users/create' do
   data = JSON.parse request.body.read

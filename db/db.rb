@@ -105,6 +105,35 @@ class Database
       "error" => oops,
     }
   end
+  
+  def sync auth_key, proposed_notes, last_updated_unix
+    user_data = decode_auth_key auth_key
+    get_notes_sql = @sql['get_notes'] % {
+      :id => user_data[0]["user_id"],
+    }
+    
+    last_updated_on_db = nil
+    stored_notes = nil
+    @conn.exec(get_notes_sql).each_row do |row|
+      stored_notes = row[4]
+      last_updated_on_db = Time.parse(row[-1]).to_i
+    end
+    
+    notes = stored_notes
+    last_updated = last_updated_on_db
+    last_updated_on_client = Time.at(last_updated_unix).to_i
+    
+    if last_updated_on_client > last_updated_on_db
+      update_notes auth_key, proposed_notes
+      notes = proposed_notes
+      last_updated = Time.now.to_i
+    end
+    
+    return {
+      "notes" => notes,
+      "last_updated" => last_updated,
+    }
+  end
 
   def drop
     @conn.exec "DROP TABLE users;"
