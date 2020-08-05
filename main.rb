@@ -36,6 +36,11 @@ get '/now' do
   }.to_json
 end
 
+post '/reset' do
+  data = JSON.parse request.body.read
+  $db.reset data['auth_key']
+end
+
 post '/users/create' do
   data = JSON.parse request.body.read
   $db.create_user(data['username'], data['password'], false, data['notes']).to_json
