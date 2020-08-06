@@ -2,6 +2,7 @@ require 'pg'
 require 'jwt'
 require 'digest'
 require 'uri'
+require 'base64'
 
 class Database
   attr_reader :create_tables_sql
@@ -37,7 +38,7 @@ class Database
     create_user_sql = @sql['create_user'] % {
       :username => username,
       :password => password,
-      :notes => (notes == nil)? "" : notes,
+      :notes => Base64.encode64((notes == nil)? "" : notes),
       :admin => (admin)? 'on' : 'off',
     }
     result = @conn.exec create_user_sql
@@ -64,7 +65,7 @@ class Database
     notes = nil
     @conn.exec(auth_user_sql).each_row do |row|
       user_id = row[0]
-      notes = row[4]
+      notes = Base64.decode64 row[4]
     end
 
     return {
@@ -81,7 +82,7 @@ class Database
     }
     notes = nil
     @conn.exec(get_notes_sql).each_row do |row|
-      notes = row[4]
+      notes = Base64.decode64(row[4])
     end
 
     return {
@@ -94,7 +95,7 @@ class Database
 
     update_notes_sql = @sql['update_notes'] % {
       :id => user_data[0]["user_id"],
-      :notes => notes,
+      :notes => Base64.encode64(notes),
     }
     oops = "It wasn't possible to perform this operation"
     @conn.exec(update_notes_sql).each_row do |row|
@@ -115,7 +116,7 @@ class Database
     last_updated_on_db = nil
     stored_notes = nil
     @conn.exec(get_notes_sql).each_row do |row|
-      stored_notes = row[4]
+      stored_notes = Base64.decode64(row[4])
       last_updated_on_db = Time.parse(row[-1]).to_i
     end
 
@@ -177,7 +178,13 @@ class Database
     if is_user_admin user_data['user_id']
        outlet = [["id", "username", "password", "admin", "notes"]]
        @conn.exec(@sql['export_users']).each_row do |row|
-         outlet << [row[0].to_i, row[1], row[2], row[3] == 't', row[4]]
+         outlet << [
+           row[0].to_i,  # id
+           row[1],  # username
+           row[2],  # password
+           row[3] == 't',  # admin
+           Base64.decode64(row[4]),  # notes
+          ]
       end
     end
 
