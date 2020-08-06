@@ -168,6 +168,28 @@ This is what I need to do
     result_notes = JSON.parse(last_response.body)["notes"]
     assert new_notes == result_notes
   end
+    
+  def test_problematic_notes
+    $db.drop
+    $db.setup
+    user_payload = $db.create_user "joe", "password", false, nil
+    auth_key = user_payload['auth_key']
+    expected_notes = %Q(# Inbox
+
+- [ ] Clean Reddit's saved posts
+)
+    data = {
+      "auth_key" => auth_key,
+      "notes" => expected_notes,
+    }
+    post '/notes', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    
+    get "/notes?auth_key=#{auth_key}"
+    assert last_response.ok?
+    result_notes = JSON.parse(last_response.body)["notes"]
+    assert expected_notes == result_notes
+  end
 
   def test_export_database
     $db.drop
