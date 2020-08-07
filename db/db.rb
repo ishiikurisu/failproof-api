@@ -2,7 +2,6 @@ require 'pg'
 require 'jwt'
 require 'digest'
 require 'uri'
-require 'base64'
 
 class Database
   attr_reader :create_tables_sql
@@ -38,7 +37,7 @@ class Database
     create_user_sql = @sql['create_user'] % {
       :username => username,
       :password => password,
-      :notes => Base64.encode64((notes == nil)? "" : notes),
+      :notes => encode_secret((notes == nil)? "" : notes),
       :admin => (admin)? 'on' : 'off',
     }
     result = @conn.exec create_user_sql
@@ -47,7 +46,7 @@ class Database
       user_id = row[0]
     end
     return {
-      "auth_key"  => (user_id == nil)? nil : encode_auth_key({:user_id => user_id}),
+      "auth_key"  => (user_id == nil)? nil : encode_secret({:user_id => user_id}),
     }
   end
 
@@ -65,24 +64,24 @@ class Database
     notes = nil
     @conn.exec(auth_user_sql).each_row do |row|
       user_id = row[0]
-      notes = Base64.decode64 row[4]
+      notes = decode_secret row[4]
     end
 
     return {
-      "auth_key" => (user_id == nil)? nil : encode_auth_key({:user_id => user_id}),
+      "auth_key" => (user_id == nil)? nil : encode_secret({:user_id => user_id}),
       "notes" => notes,
     }
   end
 
   def get_notes auth_key
-    user_data = decode_auth_key auth_key
+    user_data = decode_secret auth_key
 
     get_notes_sql = @sql['get_notes'] % {
-      :id => user_data[0]["user_id"],
+      :id => user_data["user_id"],
     }
     notes = nil
     @conn.exec(get_notes_sql).each_row do |row|
-      notes = Base64.decode64(row[4])
+      notes = decode_secret(row[4])
     end
 
     return {
@@ -91,11 +90,11 @@ class Database
   end
 
   def update_notes auth_key, notes
-    user_data = decode_auth_key auth_key
+    user_data = decode_secret auth_key
 
     update_notes_sql = @sql['update_notes'] % {
-      :id => user_data[0]["user_id"],
-      :notes => Base64.encode64(notes),
+      :id => user_data["user_id"],
+      :notes => encode_secret(notes),
     }
     oops = "It wasn't possible to perform this operation"
     @conn.exec(update_notes_sql).each_row do |row|
@@ -108,15 +107,15 @@ class Database
   end
 
   def sync auth_key, proposed_notes, last_updated_unix
-    user_data = decode_auth_key auth_key
+    user_data = decode_secret auth_key
     get_notes_sql = @sql['get_notes'] % {
-      :id => user_data[0]["user_id"],
+      :id => user_data["user_id"],
     }
 
     last_updated_on_db = nil
     stored_notes = nil
     @conn.exec(get_notes_sql).each_row do |row|
-      stored_notes = Base64.decode64(row[4])
+      stored_notes = decode_secret(row[4])
       last_updated_on_db = Time.parse(row[-1]).to_i
     end
 
@@ -157,12 +156,13 @@ class Database
   end
 
   def reset auth_key
-    user_data = decode_auth_key(auth_key)[0]
+    user_data = decode_secret(auth_key)
     oops = "user not authorized"
 
     if is_user_admin user_data['user_id']
       drop
       setup
+      # XXX create admin user if possible
       oops = nil
     end
 
@@ -172,7 +172,7 @@ class Database
   end
 
   def export auth_key
-    user_data = decode_auth_key(auth_key)[0]
+    user_data = decode_secret auth_key
     outlet = nil
 
     if is_user_admin user_data['user_id']
@@ -183,7 +183,7 @@ class Database
            row[1],  # username
            row[2],  # password
            row[3] == 't',  # admin
-           Base64.decode64(row[4]),  # notes
+           decode_secret(row[4]),  # notes
           ]
       end
     end
@@ -194,7 +194,7 @@ class Database
   end
 
   def import auth_key, database
-    user_data = decode_auth_key(auth_key)[0]
+    user_data = decode_secret(auth_key)
     oops = nil
 
     if is_user_admin user_data['user_id']
@@ -218,11 +218,11 @@ class Database
     return outlet
   end
 
-  def encode_auth_key user_data
-    JWT.encode user_data, @salt, 'HS256'
+  def encode_secret data
+    JWT.encode(data, @salt, 'HS256')
   end
 
-  def decode_auth_key auth_key
-    JWT.decode auth_key, @salt, 'HS256'
+  def decode_secret secret
+    JWT.decode(secret, @salt, 'HS256')[0]
   end
 end

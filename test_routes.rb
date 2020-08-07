@@ -168,7 +168,7 @@ This is what I need to do
     result_notes = JSON.parse(last_response.body)["notes"]
     assert new_notes == result_notes
   end
-    
+
   def test_problematic_notes
     $db.drop
     $db.setup
@@ -184,7 +184,7 @@ This is what I need to do
     }
     post '/notes', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
-    
+
     get "/notes?auth_key=#{auth_key}"
     assert last_response.ok?
     result_notes = JSON.parse(last_response.body)["notes"]
@@ -287,11 +287,11 @@ This is what I need to do
     result = JSON.parse(last_response.body)["database"]
     assert database == result
   end
-    
+
   def test_sync_notes
     $db.drop
     $db.setup
-    
+
     old_notes = %Q(# My first checklist
 This is what I need to do
 - [x] This is a done item
@@ -302,10 +302,10 @@ This is what I need to do
 - [x] This is a done item
 - [x] This item is still pending
 )
-    
+
     user_payload = $db.create_user "joe", "password", false, old_notes
     auth_key = user_payload["auth_key"]
-    
+
     data = {
       "auth_key" => auth_key,
       "notes" => new_notes,
@@ -317,7 +317,7 @@ This is what I need to do
     result_notes = payload["notes"]
     assert result_notes == new_notes
     expected_last_updated = payload["last_updated"]
-    
+
     data = {
       "auth_key" => auth_key,
       "notes" => old_notes,
@@ -330,5 +330,16 @@ This is what I need to do
     result_last_updated = payload["last_updated"]
     assert result_notes == new_notes
     assert expected_last_updated == result_last_updated
+  end
+
+  def test_encoding_decoding_notes
+    notes = %Q(# My first checklist
+This is what I need to do
+- [x] This is a done item
+- [x] This item is still pending
+)
+    encoded_notes = $db.encode_secret notes
+    decoded_notes = $db.decode_secret encoded_notes
+    assert notes == decoded_notes
   end
 end
