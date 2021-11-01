@@ -23,7 +23,8 @@ class MainRoutesTest < Test::Unit::TestCase
     post '/users/create', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
 
-    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
+    # for salt "salt"
+    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.dg-V0k1N73YvpDhInwIivBFbM1PPyCVePYhxr9jD6gk"
     result_auth_key = JSON.parse(last_response.body)["auth_key"]
     assert expected_auth_key == result_auth_key
 
@@ -58,7 +59,7 @@ class MainRoutesTest < Test::Unit::TestCase
     post '/users/auth', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
 
-    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
+    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.dg-V0k1N73YvpDhInwIivBFbM1PPyCVePYhxr9jD6gk"
     result_auth_key = JSON.parse(last_response.body)["auth_key"]
     assert expected_auth_key == result_auth_key
 
@@ -86,7 +87,7 @@ This is what I need to do
     post '/users/create', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
 
-    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
+    expected_auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.dg-V0k1N73YvpDhInwIivBFbM1PPyCVePYhxr9jD6gk"
     result_auth_key = JSON.parse(last_response.body)["auth_key"]
     assert expected_auth_key == result_auth_key
 
@@ -107,7 +108,7 @@ This is what I need to do
     # user does not exist
     $db.drop
     $db.setup
-    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
+    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.dg-V0k1N73YvpDhInwIivBFbM1PPyCVePYhxr9jD6gk"
     get "/notes?auth_key=#{auth_key}"
     assert last_response.ok?
     result_notes = JSON.parse(last_response.body)["notes"]
@@ -131,7 +132,7 @@ This is what I need to do
     $db.drop
     $db.setup
     # TODO include a test which this token's secret does not match ours
-    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Ivr5KYifo8B-ecdNqaOJZOmHX2eG1h7akHViZzoSRBk"
+    auth_key = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.dg-V0k1N73YvpDhInwIivBFbM1PPyCVePYhxr9jD6gk"
     new_notes = %Q(# My first checklist
 This is what I need to do
 - [x] This is a done item

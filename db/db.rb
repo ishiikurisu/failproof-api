@@ -7,19 +7,8 @@ class Database
   attr_reader :create_tables_sql
 
   def initialize dboptions, sql_folder
-    if dboptions.has_key? 'database_url'
-      uri = URI.parse(ENV['DATABASE_URL'])
-      @conn = PG.connect(uri.hostname, uri.port, nil, nil, uri.path[1..-1], uri.user, uri.password)
-    else
-      host = dboptions['host']
-      port = dboptions['port']
-      dbname = dboptions['dbname']
-      user = dboptions['user']
-      password = dboptions['password']
-      tty = nil
-      options = nil
-      @conn = PG.connect(host, port, options, tty, dbname, user, password)
-    end
+    uri = URI.parse(dboptions['database_url'])
+    @conn = PG.connect(uri.hostname, uri.port, nil, nil, uri.path[1..-1], uri.user, uri.password)
 
     @sql = {}
     Dir["#{sql_folder}/*.sql"].each do |fn|
@@ -223,6 +212,6 @@ class Database
   end
 
   def decode_secret secret
-    JWT.decode(secret, @salt, 'HS256')[0]
+    JWT.decode(secret, @salt, 'HS256', {verify_expiration: false})[0]
   end
 end
