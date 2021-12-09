@@ -1,11 +1,6 @@
 default:
-	bundle exec rackup -p 9292 config.ru
+	lein run
 
 test:
-	ruby test_routes.rb
+	lein test
 
-import-database:
-	ruby tasks.rb i db.jsonl
-
-export-database:
-	ruby tasks.rb e db.jsonl
