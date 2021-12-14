@@ -35,6 +35,17 @@
 (defn setup-database []
   (jdbc/execute! ds [(get sql :create-tables)]))
 
+(defn- user-id-to-auth [user-id]
+  (if (nil? user-id)
+    user-id
+    (utils/encode-secret {:user-id user-id})))
+
+(defn- get-notes [query-result]
+  (let [encoded-notes (-> query-result first (get :notes))]
+    (if (nil? encoded-notes)
+      encoded-notes
+      (-> (utils/decode-secret encoded-notes) (get :notes)))))
+
 (defn create-user [username password notes]
   (let [params {"admin" "off"
                 "notes" (utils/encode-secret {:notes (or notes "")})
@@ -43,6 +54,14 @@
         query (strint/strint (get sql :create-user) params)
         result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
         user-id (-> result first (get :id))]
-    {:auth-key (if (nil? user-id)
-                  user-id
-                  (utils/encode-secret {:user-id user-id}))}))
+    {:auth-key (user-id-to-auth user-id)}))
+
+(defn auth-user [username password]
+  (let [params {"password" (utils/hide password)
+                "username" username}
+        query (strint/strint (get sql :auth-user) params)
+        result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
+        user-id (-> result first (get :id))
+        notes (get-notes result)]
+    {:auth-key (user-id-to-auth user-id)
+     :notes notes}))

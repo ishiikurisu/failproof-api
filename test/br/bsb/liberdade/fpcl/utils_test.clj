@@ -9,3 +9,9 @@
           decoded (utils/decode-secret encoded)]
       (is (= data decoded))
       (is (not (= data encoded))))))
+
+(deftest password-handling
+  (testing "can hide the same password many times over"
+    (let [p1 (utils/hide "password")
+          p2 (utils/hide "password")]
+      (is (= p1 p2)))))

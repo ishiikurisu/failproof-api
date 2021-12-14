@@ -10,7 +10,6 @@
                  [org.clojure/data.json "0.2.6"]
                  [selmer "1.12.40"]
                  [buddy/buddy-sign "3.4.1"]
-                 [buddy/buddy-hashers "1.8.1"]
                  [org.clojars.liberdade/strint "0.0.1"]
                  [com.github.seancorfield/next.jdbc "1.2.753"]
                  [org.postgresql/postgresql "42.2.10"]]

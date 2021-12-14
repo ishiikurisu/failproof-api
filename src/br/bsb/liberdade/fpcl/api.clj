@@ -32,9 +32,15 @@
         notes (get params "notes")]
     (boilerplate (db/create-user username password notes))))
 
+(defn auth-users [req]
+  (let [params (json/read-str (slurp (:body req)))
+        username (get params "username")
+        password (get params "password")]
+    (boilerplate (db/auth-user username password))))
+
 (defroutes app-routes
-  (GET "/" [] index-page)
-  (POST "/users/create" [] create-users))
+  (POST "/users/create" [] create-users)
+  (POST "/users/auth" [] auth-users))
 
 ; ###############
 ; # Entry point #

@@ -2,6 +2,12 @@
   (:require [clojure.test :refer :all]
             [br.bsb.liberdade.fpcl.db :as db]))
 
+(def test-note
+  (str "# Introduction Note\n"
+       "- List item #1\n"
+       "- List item #2\n"
+       "A paragraph as example\n"))
+
 (deftest create-users-test
   (testing "Creating users as expected"
     (do
@@ -19,3 +25,28 @@
             notes nil
             result (db/create-user username password notes)]
         (is (nil? (:auth-key result)))))))
+
+(deftest auth-users-test
+  (testing "Authenticating (or not) users as expected"
+    (do
+      (db/drop-database)
+      (db/setup-database)
+      ; testing if creating a new user works
+      (let [username "username"
+            password "password"
+            notes test-note
+            creation-result (db/create-user username password notes)
+            result (db/auth-user username password)]
+        (is (not (nil? (:auth-key creation-result))))
+        (is (not (nil? (:auth-key result))))
+        (is (= notes (:notes result))))
+      (let [username "username"
+            password "wrong password"
+            result (db/auth-user username password)]
+        (is (nil? (:auth-key result)))
+        (is (nil? (:notes result))))
+      (let [username "inexistent username"
+            password "password"
+            result (db/auth-user username password)]
+        (is (nil? (:auth-key result)))
+        (is (nil? (:notes result)))))))
