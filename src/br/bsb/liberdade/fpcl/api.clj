@@ -5,7 +5,17 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer :all]
-            [selmer.parser :refer :all]))
+            [selmer.parser :refer :all]
+            [br.bsb.liberdade.fpcl.db :as db]))
+
+; #############
+; # UTILITIES #
+; #############
+
+(defn- boilerplate [body]
+  {:status 200
+   :headers {"Content-Type" "text/json"}
+   :body (str (json/write-str body))})
 
 ; ##########
 ; # ROUTES #
@@ -15,13 +25,22 @@
    :headers {"Content-Type" "text/json"}
    :body (str (json/write-str {:error "not defined yet"}))})
 
+(defn create-users [req]
+  (let [params (json/read-str (slurp (:body req)))
+        username (get params "username")
+        password (get params "password")
+        notes (get params "notes")]
+    (boilerplate (db/create-user username password notes))))
+
 (defroutes app-routes
-  (GET "/" [] index-page))
+  (GET "/" [] index-page)
+  (POST "/users/create" [] create-users))
 
 ; ###############
 ; # Entry point #
 ; ###############
 (defn -main [& args]
   (let [port (Integer/parseInt (or (System/getenv "PORT") "3000"))]
-    (server/run-server (wrap-defaults #'app-routes site-defaults) {:port port})
+    (db/setup-database)
+    (server/run-server (wrap-defaults #'app-routes (assoc site-defaults :security nil)) {:port port})
     (println (str "Listening at http://localhost:" port "/"))))
