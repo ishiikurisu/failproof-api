@@ -40,7 +40,7 @@
     user-id
     (utils/encode-secret {:user-id user-id})))
 
-(defn- get-notes [query-result]
+(defn- get-notes-from-query [query-result]
   (let [encoded-notes (-> query-result first (get :notes))]
     (if (nil? encoded-notes)
       encoded-notes
@@ -62,6 +62,14 @@
         query (strint/strint (get sql :auth-user) params)
         result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
         user-id (-> result first (get :id))
-        notes (get-notes result)]
+        notes (get-notes-from-query result)]
     {"auth_key" (user-id-to-auth user-id)
      :notes notes}))
+
+(defn get-notes [auth]
+  (let [user-id (-> auth utils/decode-secret :user-id)
+        params {"id" user-id}
+        query (strint/strint (get sql :get-notes) params)
+        result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
+        notes (get-notes-from-query result)]
+    {:notes notes}))

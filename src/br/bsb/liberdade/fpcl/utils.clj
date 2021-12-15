@@ -9,7 +9,9 @@
   (jwt/encrypt data salt))
 
 (defn decode-secret [secret]
-  (jwt/decrypt secret salt))
+  (try
+    (jwt/decrypt secret salt)
+    (catch clojure.lang.ExceptionInfo e nil)))
 
 (defn- cover [secret]
   (-> (hash/sha256 (str secret salt))

@@ -38,9 +38,15 @@
         password (get params "password")]
     (boilerplate (db/auth-user username password))))
 
+(defn get-notes [req]
+  (let [params (:params req)
+        auth-key (:auth_key params)]
+    (boilerplate (db/get-notes auth-key))))
+
 (defroutes app-routes
   (POST "/users/create" [] create-users)
-  (POST "/users/auth" [] auth-users))
+  (POST "/users/auth" [] auth-users)
+  (GET "/notes" [] get-notes))
 
 ; ###############
 ; # Entry point #
