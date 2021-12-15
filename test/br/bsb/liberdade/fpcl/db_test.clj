@@ -18,13 +18,13 @@
             password "password"
             notes nil
             result (db/create-user username password notes)]
-        (is (not (nil? (:auth-key result)))))
+        (is (not (nil? (get result "auth_key")))))
       ; testing if creating the user again fails
       (let [username "username"
             password "password"
             notes nil
             result (db/create-user username password notes)]
-        (is (nil? (:auth-key result)))))))
+        (is (nil? (get result "auth_key")))))))
 
 (deftest auth-users-test
   (testing "Authenticating (or not) users as expected"
@@ -37,16 +37,16 @@
             notes test-note
             creation-result (db/create-user username password notes)
             result (db/auth-user username password)]
-        (is (not (nil? (:auth-key creation-result))))
-        (is (not (nil? (:auth-key result))))
+        (is (not (nil? (get creation-result "auth_key"))))
+        (is (not (nil? (get result "auth_key"))))
         (is (= notes (:notes result))))
       (let [username "username"
             password "wrong password"
             result (db/auth-user username password)]
-        (is (nil? (:auth-key result)))
+        (is (nil? (get result "auth_key")))
         (is (nil? (:notes result))))
       (let [username "inexistent username"
             password "password"
             result (db/auth-user username password)]
-        (is (nil? (:auth-key result)))
+        (is (nil? (get result "auth_key")))
         (is (nil? (:notes result)))))))

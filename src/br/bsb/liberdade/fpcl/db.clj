@@ -54,7 +54,7 @@
         query (strint/strint (get sql :create-user) params)
         result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
         user-id (-> result first (get :id))]
-    {:auth-key (user-id-to-auth user-id)}))
+    {"auth_key" (user-id-to-auth user-id)}))
 
 (defn auth-user [username password]
   (let [params {"password" (utils/hide password)
@@ -63,5 +63,5 @@
         result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
         user-id (-> result first (get :id))
         notes (get-notes result)]
-    {:auth-key (user-id-to-auth user-id)
+    {"auth_key" (user-id-to-auth user-id)
      :notes notes}))
