@@ -73,3 +73,11 @@
         result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
         notes (get-notes-from-query result)]
     {:notes notes}))
+
+(defn update-notes [auth notes]
+  (let [params {"id" (-> auth utils/decode-secret :user-id)
+                "notes" (utils/encode-secret {:notes (or notes "")})}
+        query (strint/strint (get sql :update-notes) params)
+        result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})]
+    {:error (if (> (count result) 0) nil "Invalid auth key")}))
+

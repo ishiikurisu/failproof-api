@@ -7,6 +7,8 @@
        "- List item #1\n"
        "- List item #2\n"
        "A paragraph as example\n"))
+(def another-test-note
+  (str "Another test note, nothing serious"))
 (def random-auth-key
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIzNH0.rWp8vvb4aDZAGcHEYjhCe9qaaf8mSyvyLeyC1QuZWU0")
 
@@ -70,3 +72,18 @@
             result (db/get-notes (get auth "auth_key"))
             notes (:notes result)]
         (is (= notes test-note))))))
+
+(deftest update-notes
+  (testing "updating notes"
+    (do
+      (db/drop-database)
+      (db/setup-database)
+      (db/create-user "username" "password" test-note)
+      (let [auth (db/auth-user "username" "password")
+            update-result (db/update-notes (get auth "auth_key") another-test-note)
+            new-notes (-> auth (get "auth_key") (db/get-notes) :notes)]
+        (is (nil? (:error update-result)))
+        (is (= new-notes another-test-note)))))
+  (testing "fails update gracefully"
+    (let [update-result (db/update-notes random-auth-key another-test-note)]
+      (-> update-result :error (nil?) (not) (is)))))

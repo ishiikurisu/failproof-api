@@ -43,10 +43,17 @@
         auth-key (:auth_key params)]
     (boilerplate (db/get-notes auth-key))))
 
+(defn post-notes [req]
+  (let [params (json/read-str (slurp (:body req)))
+        auth-key (get params "auth_key")
+        notes (get params "notes")]
+    (boilerplate (db/update-notes auth-key notes))))
+
 (defroutes app-routes
   (POST "/users/create" [] create-users)
   (POST "/users/auth" [] auth-users)
-  (GET "/notes" [] get-notes))
+  (GET "/notes" [] get-notes)
+  (POST "/notes" [] post-notes))
 
 ; ###############
 ; # Entry point #
