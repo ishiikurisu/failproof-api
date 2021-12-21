@@ -21,3 +21,17 @@
     (let [p1 (utils/hide "password")
           p2 (utils/hide "password")]
       (is (= p1 p2)))))
+
+(deftest repeatability
+  (testing "can repeatedly encode and decode data"
+    (let [data {:data "a random payload again"}
+          original-encoded (utils/encode-secret data)
+          original-decoded (utils/decode-secret original-encoded)]
+      (is (= data original-decoded))
+      (loop [i 0
+             encoded (utils/encode-secret original-decoded)]
+        (when (< i 1000)
+          (let [decoded (utils/decode-secret encoded)]
+            (is (= data decoded))
+            (recur (+ 1 i)
+                   (utils/encode-secret decoded))))))))

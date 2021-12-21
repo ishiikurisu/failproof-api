@@ -11,9 +11,12 @@
                  [selmer "1.12.40"]
                  [buddy/buddy-sign "3.4.1"]
                  [org.clojars.liberdade/strint "0.0.1"]
+                 [jumblerg/ring-cors "2.0.0"]
                  [com.github.seancorfield/next.jdbc "1.2.753"]
                  [org.postgresql/postgresql "42.2.10"]]
+  :min-lein-version "2.9.8"
   :main ^:skip-aot br.bsb.liberdade.fpcl.api
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
+                       :uberjar-name "br.bsb.liberdade.fpcl.api.jar"
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})

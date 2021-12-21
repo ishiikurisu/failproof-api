@@ -3,24 +3,16 @@
             [buddy.core.hash :as hash]
             [buddy.core.codecs :as codecs]))
 
-(def salt (hash/sha256 (or (System/getenv "SALT") "TODO REPLACE ME")))
+(def salt (-> (hash/md5 (or (System/getenv "SALT") "SALT")) (codecs/bytes->hex)))
 
 (defn encode-secret [data]
-  (jwt/encrypt data salt))
+  (jwt/sign data salt))
 
 (defn decode-secret [secret]
   (try
-    (jwt/decrypt secret salt)
+    (jwt/unsign secret salt)
     (catch clojure.lang.ExceptionInfo e nil)))
 
-(defn- cover [secret]
-  (-> (hash/sha256 (str secret salt))
-      (codecs/bytes->hex)))
-
 (defn hide [secret]
-  (loop [i 0
-         outlet (cover secret)]
-    (if (> i 9081)
-      (cover outlet)
-      (recur (+ 1 i)
-             (cover outlet)))))
+  (-> (hash/md5 (str secret salt))
+      (codecs/bytes->hex)))
