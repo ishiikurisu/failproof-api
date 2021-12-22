@@ -4,17 +4,21 @@ Let's get these lists for you!
 
 ## Installation
 
-To build this project, run the following command:
+To install dependencies and execute this project, run the following command:
 
 ```
-bundle install
-make
+lein run
 ```
 
 To unit tests, run the following command:
 
 ```
-make test
+lein test
+```
+
+To build this project, run the following command:
+```
+lein uberjar
 ```
 
 ## Usage
