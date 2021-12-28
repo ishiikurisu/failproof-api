@@ -120,3 +120,23 @@
         (is (nil? (:error update-result)))
         (is (nil? (:error new-auth))))
       (db/drop-database))))
+
+(deftest backup-database
+  (testing "do not backup the database is the user is not an admin"
+    (do
+      (db/setup-database)
+      (db/create-user "username" "password" test-note)
+      (let [auth (db/auth-user "username" "password")
+            backup (-> auth (get "auth_key") (db/backup))]
+        (is (nil? (:database backup))))
+      (db/drop-database)))
+  (testing "database backup works as expected"
+    (do
+      (db/setup-database)
+      (db/create-admin "admin" "secretpassword" test-note)
+      (db/create-user "username" "password" another-test-note)
+      (let [auth (db/auth-user "admin" "secretpassword")
+            backup (-> auth (get "auth_key") (db/backup))]
+        ; TODO verify database is correct
+        (is (not (nil? (:database backup)))))
+      (db/drop-database))))

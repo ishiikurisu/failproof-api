@@ -47,21 +47,30 @@
       encoded-notes
       (-> (utils/decode-secret encoded-notes) (get :notes)))))
 
-(defn create-user [username password notes]
-  (let [params {"admin" "off"
+(defn- execute-query [query]
+  (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps}))
+
+(defn- add-user [username password notes admin-status]
+  (let [params {"admin" admin-status
                 "notes" (utils/encode-secret {:notes (or notes "")})
                 "password" (utils/hide password)
                 "username" username}
         query (strint/strint (get sql :create-user) params)
-        result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
+        result (execute-query query)
         user-id (-> result first (get :id))]
     {"auth_key" (user-id-to-auth user-id)}))
+
+(defn create-user [username password notes]
+  (add-user username password notes "off"))
+
+(defn create-admin [username password notes]
+  (add-user username password notes "on"))
 
 (defn auth-user [username password]
   (let [params {"password" (utils/hide password)
                 "username" username}
         query (strint/strint (get sql :auth-user) params)
-        result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
+        result (execute-query query)
         user-id (-> result first (get :id))
         notes (get-notes-from-query result)]
     {"auth_key" (user-id-to-auth user-id)
@@ -81,7 +90,7 @@
   (let [user-id (-> auth utils/decode-secret :user-id)
         params {"id" user-id}
         query (strint/strint (get sql :get-notes) params)
-        result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})
+        result (execute-query query)
         notes (get-notes-from-query result)]
     {:notes notes}))
 
@@ -89,5 +98,14 @@
   (let [params {"id" (-> auth utils/decode-secret :user-id)
                 "notes" (utils/encode-secret {:notes (or notes "")})}
         query (strint/strint (get sql :update-notes) params)
-        result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})]
+        result (execute-query query)]
     {:error (if (> (count result) 0) nil "Invalid auth key")}))
+
+(defn backup [auth]
+  (let [user-id (-> auth utils/decode-secret :user-id)
+        user-query (strint/strint (get sql :get-notes) {"id" user-id})
+        is-admin-result (execute-query user-query)
+        is-admin (-> is-admin-result first (get :admin))]
+    {:database (if is-admin
+                   (execute-query (get sql :export-users))
+                   nil)}))
