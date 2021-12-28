@@ -15,7 +15,6 @@
 (deftest create-users-test
   (testing "Creating users as expected"
     (do
-      (db/drop-database)
       (db/setup-database)
       ; testing if creating a new user works
       (let [username "username"
@@ -28,12 +27,12 @@
             password "password"
             notes nil
             result (db/create-user username password notes)]
-        (is (nil? (get result "auth_key")))))))
+        (is (nil? (get result "auth_key"))))
+      (db/drop-database))))
 
 (deftest auth-users-test
   (testing "Authenticating (or not) users as expected"
     (do
-      (db/drop-database)
       (db/setup-database)
       (let [username "username"
             password "password"
@@ -42,51 +41,61 @@
             result (db/auth-user username password)]
         (is (not (nil? (get creation-result "auth_key"))))
         (is (not (nil? (get result "auth_key"))))
-        (is (= notes (:notes result))))))
-    (testing "Fails with wrong username"
+        (is (= notes (:notes result))))
+      (db/drop-database)))
+  (testing "Fails with wrong username"
+    (do
+      (db/setup-database)
       (let [username "username"
             password "wrong password"
             result (db/auth-user username password)]
         (is (nil? (get result "auth_key")))
-        (is (nil? (:notes result)))))
-    (testing "Fails with inexistent username"
+        (is (nil? (:notes result))))
+      (db/drop-database)))
+  (testing "Fails with inexistent username"
+    (do
+      (db/setup-database)
       (let [username "inexistent username"
             password "password"
             result (db/auth-user username password)]
         (is (nil? (get result "auth_key")))
-        (is (nil? (:notes result))))))
+        (is (nil? (:notes result))))
+      (db/drop-database))))
 
 (deftest get-notes
   (testing "No notes from inexistent users"
     (do
-      (db/drop-database)
       (db/setup-database)
       (let [result (db/get-notes random-auth-key)]
-        (is (nil? (:notes result))))))
+        (is (nil? (:notes result))))
+      (db/drop-database)))
   (testing "Getting notes from existing users"
     (do
-      (db/drop-database)
       (db/setup-database)
       (db/create-user "username" "password" test-note)
       (let [auth (db/auth-user "username" "password")
             result (db/get-notes (get auth "auth_key"))
             notes (:notes result)]
-        (is (= notes test-note))))))
+        (is (= notes test-note)))
+      (db/drop-database))))
 
 (deftest update-notes
   (testing "updating notes"
     (do
-      (db/drop-database)
       (db/setup-database)
       (db/create-user "username" "password" test-note)
       (let [auth (db/auth-user "username" "password")
             update-result (db/update-notes (get auth "auth_key") another-test-note)
             new-notes (-> auth (get "auth_key") (db/get-notes) :notes)]
         (is (nil? (:error update-result)))
-        (is (= new-notes another-test-note)))))
+        (is (= new-notes another-test-note)))
+      (db/drop-database)))
   (testing "fails update gracefully"
-    (let [update-result (db/update-notes random-auth-key another-test-note)]
-      (-> update-result :error (nil?) (not) (is)))))
+    (do
+      (db/setup-database)
+      (let [update-result (db/update-notes random-auth-key another-test-note)]
+        (-> update-result :error (nil?) (not) (is)))
+      (db/drop-database))))
 
 (deftest update-password
   (testing "fails to update password"
