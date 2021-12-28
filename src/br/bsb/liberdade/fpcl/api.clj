@@ -23,7 +23,7 @@
 (defn- url-search-params [raw]
   (->> (string/split raw #"&")
        (map #(string/split % #"="))
-       (reduce (fn [box [key value]] (assoc box key value)) {})))
+       (reduce (fn [state [key value]] (assoc state key value)) {})))
 
 ; ##########
 ; # ROUTES #
@@ -62,12 +62,21 @@
         notes (get params "notes")]
     (boilerplate (db/update-notes auth-key notes))))
 
+(defn export-backup [req]
+  (-> req
+      :query-string
+      (url-search-params)
+      (get "auth_key")
+      (db/backup)
+      (boilerplate)))
+
 (defroutes app-routes
   (POST "/users/create" [] create-users)
   (POST "/users/auth" [] auth-users)
   (POST "/users/password" [] update-password)
   (GET "/notes" [] get-notes)
-  (POST "/notes" [] post-notes))
+  (POST "/notes" [] post-notes)
+  (GET "/backup" [] export-backup))
 
 ; ###############
 ; # Entry point #
