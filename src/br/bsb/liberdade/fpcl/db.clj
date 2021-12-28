@@ -20,6 +20,7 @@
    :create-tables "create_tables.sql"
    :create-user "create_user.sql"
    :export-users "export_users.sql"
+   :update-password "update_password.sql"
    :get-notes "get_notes.sql"
    :update-notes "update_notes.sql"
    :drop-database "drop_database.sql"})
@@ -66,6 +67,22 @@
     {"auth_key" (user-id-to-auth user-id)
      :notes notes}))
 
+(defn- change-password [user-id new-password]
+  (let [params {"password" (utils/hide new-password)
+                "id" user-id}
+        query (strint/strint (get sql :update-password) params)
+        result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})]
+    (if (= 1 (count result))
+      nil
+      "Failed to change password")))
+
+(defn update-password [username old-password new-password]
+  (let [auth (-> (auth-user username old-password) (get "auth_key"))]
+    {:error (if (nil? auth)
+                "Wrong username or password"
+                (change-password (-> auth utils/decode-secret :user-id)
+                                 new-password))}))
+
 (defn get-notes [auth]
   (let [user-id (-> auth utils/decode-secret :user-id)
         params {"id" user-id}
@@ -80,4 +97,3 @@
         query (strint/strint (get sql :update-notes) params)
         result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})]
     {:error (if (> (count result) 0) nil "Invalid auth key")}))
-

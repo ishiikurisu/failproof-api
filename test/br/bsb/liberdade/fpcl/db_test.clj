@@ -87,3 +87,24 @@
   (testing "fails update gracefully"
     (let [update-result (db/update-notes random-auth-key another-test-note)]
       (-> update-result :error (nil?) (not) (is)))))
+
+(deftest update-password
+  (testing "fails to update password"
+    (do
+      (db/setup-database)
+      (db/create-user "username" "password" test-note)
+      (let [update-result (db/update-password "username"
+                                              "wrong password"
+                                              "newPassword")]
+        (is (not (nil? (:error update-result)))))
+      (db/drop-database)))
+  (testing "update password"
+    (do
+      (db/setup-database)
+      (db/create-user "username" "password" test-note)
+      (let [auth (db/auth-user "username" "password")
+            update-result (db/update-password "username" "password" "newPassword")
+            new-auth (db/auth-user "username" "newPassword")]
+        (is (nil? (:error update-result)))
+        (is (nil? (:error new-auth))))
+      (db/drop-database))))
