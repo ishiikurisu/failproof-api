@@ -41,6 +41,13 @@
         password (get params "password")]
     (boilerplate (db/auth-user username password))))
 
+(defn update-password [req]
+  (let [params (-> req :body slurp json/read-str)
+        username (get params "username")
+        old-password (get params "old_password")
+        new-password (get params "new_password")]
+    (boilerplate (db/update-password username old-password new-password))))
+
 (defn get-notes [req]
   (-> req
       :query-string
@@ -58,6 +65,7 @@
 (defroutes app-routes
   (POST "/users/create" [] create-users)
   (POST "/users/auth" [] auth-users)
+  (POST "/users/password" [] update-password)
   (GET "/notes" [] get-notes)
   (POST "/notes" [] post-notes))
 
