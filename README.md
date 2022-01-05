@@ -43,6 +43,15 @@ The API comes with the following HTTP methods:
   - Returns:
     - `auth_key`: `string`
     - `notes`: Markdown or `null`
+- `/users/password`
+  - Allows users to change password
+  - Method: `POST`
+  - Parameters:
+    - `auth_key`: `string`
+    - `old_password`: `string`
+    - `new_password`: `string`
+  - Returns:
+    - `error`: `string` or `null`
 - `/notes`
   - Obtains the notes for a given user
   - Method: `GET`
