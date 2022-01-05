@@ -43,10 +43,10 @@
 
 (defn update-password [req]
   (let [params (-> req :body slurp json/read-str)
-        username (get params "username")
+        auth-key (get params "auth_key")
         old-password (get params "old_password")
         new-password (get params "new_password")]
-    (boilerplate (db/update-password username old-password new-password))))
+    (boilerplate (db/update-password auth-key old-password new-password))))
 
 (defn get-notes [req]
   (-> req

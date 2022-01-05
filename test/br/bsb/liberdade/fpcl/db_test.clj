@@ -93,7 +93,9 @@
     (do
       (db/setup-database)
       (db/create-user "username" "password" test-note)
-      (let [update-result (db/update-password "username"
+      (let [auth (db/auth-user "username" "password")
+            auth-key (get auth "auth_key")
+            update-result (db/update-password auth-key
                                               "wrong password"
                                               "newPassword")]
         (is (not (nil? (:error update-result)))))
@@ -103,7 +105,8 @@
       (db/setup-database)
       (db/create-user "username" "password" test-note)
       (let [auth (db/auth-user "username" "password")
-            update-result (db/update-password "username" "password" "newPassword")
+            auth-key (get auth "auth_key")
+            update-result (db/update-password auth-key "password" "newPassword")
             new-auth (db/auth-user "username" "newPassword")]
         (is (nil? (:error update-result)))
         (is (nil? (:error new-auth))))

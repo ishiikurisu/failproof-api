@@ -67,21 +67,15 @@
     {"auth_key" (user-id-to-auth user-id)
      :notes notes}))
 
-(defn- change-password [user-id new-password]
-  (let [params {"password" (utils/hide new-password)
-                "id" user-id}
+(defn update-password [auth-key old-password new-password]
+  (let [params {"id" (-> auth-key utils/decode-secret :user-id)
+                "oldpassword" (utils/hide old-password)
+                "newpassword" (utils/hide new-password)}
         query (strint/strint (get sql :update-password) params)
         result (jdbc/execute! ds [query] {:builder-fn rs/as-unqualified-lower-maps})]
-    (if (= 1 (count result))
-      nil
-      "Failed to change password")))
-
-(defn update-password [username old-password new-password]
-  (let [auth (-> (auth-user username old-password) (get "auth_key"))]
-    {:error (if (nil? auth)
-                "Wrong username or password"
-                (change-password (-> auth utils/decode-secret :user-id)
-                                 new-password))}))
+    {:error (if (= 1 (count result))
+                nil
+                "Failed to change password")}))
 
 (defn get-notes [auth]
   (let [user-id (-> auth utils/decode-secret :user-id)
