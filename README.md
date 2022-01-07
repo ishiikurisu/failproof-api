@@ -67,24 +67,14 @@ The API comes with the following HTTP methods:
     - `notes`: Markdown or `null`
   - Returns:
     - `error`: `string` or `null`
-- `/sync`
-  - Sync the notes from user
-  - Method: `POST`
-  - Parameters:
-    - `auth_key`: `string`
-    - `notes`: Markdown or `null`
-    - `last_updated`: timestamp
-  - Returns:
-    - `notes`: the most up to date version of the notes
-    - `last_updated`: the date of the last update
-- `/export`
+- `/backup`
   - Exports database
-  - Method: `POST`
+  - Method: `GET`
   - Parameters:
     - `auth_key`: `string`
   - Returns:
     - `database`: `string` or `null`
-- `/import`
+- `/backup`
   - Imports database
   - Method: `POST`
   - Parameters:
@@ -92,11 +82,3 @@ The API comes with the following HTTP methods:
     - `database`: `string`
   - Returns:
     - `error`: `string` or `null`
-
-# Acknoledgements
-
-This project is possible due to:
-
-- [Ruby PG](https://rubydoc.info/gems/pg/1.2.3)
-- [Sinatra](http://sinatrarb.com/)
-- [cyu/rack-cors](https://github.com/cyu/rack-cors)
