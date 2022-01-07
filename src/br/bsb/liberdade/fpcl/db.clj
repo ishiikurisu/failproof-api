@@ -20,6 +20,7 @@
    :create-tables "create_tables.sql"
    :create-user "create_user.sql"
    :export-users "export_users.sql"
+   :import-user "import_user.sql"
    :update-password "update_password.sql"
    :get-notes "get_notes.sql"
    :update-notes "update_notes.sql"
@@ -109,3 +110,30 @@
     {:database (if is-admin
                    (execute-query (get sql :export-users))
                    nil)}))
+
+(defn- add-raw-entry [state query]
+  (let [result (execute-query query)]
+    (if (= 0 (count result))
+        (str "Failed to execute query: " query)
+        state)))
+(defn- build-add-raw-entry-query [entry]
+  (strint/strint (get sql :import-user) 
+                 {"id" (:id entry)
+                  "username" (:username entry)
+                  "password" (:password entry)
+                  "admin" (if (:admin entry) "on" "off")
+                  "notes" (:notes entry)
+                  "last_updated" (:last_updated entry)}))
+(defn- add-raw-entries [entries]
+  (let [queries (map build-add-raw-entry-query entries)]
+    (drop-database)
+    (setup-database)
+    (reduce add-raw-entry nil queries)))
+(defn import-backup [auth backup]
+  (let [user-id (-> auth utils/decode-secret :user-id)
+        user-query (strint/strint (get sql :get-notes) {"id" user-id})
+        is-admin-result (execute-query user-query)
+        is-admin (-> is-admin-result first (get :admin))]
+    {:error (if is-admin
+                (add-raw-entries (:database backup))
+                "Not a valid action")}))

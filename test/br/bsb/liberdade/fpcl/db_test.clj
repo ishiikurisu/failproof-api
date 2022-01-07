@@ -140,3 +140,29 @@
         ; TODO verify database is correct
         (is (not (nil? (:database backup)))))
       (db/drop-database))))
+
+(deftest import-database-backup
+  (testing "do not import the database if the user is not an admin"
+    (do
+      (db/setup-database)
+      (db/create-user "username" "password" test-note)
+      (db/create-admin "admin" "secretpassword" another-test-note)
+      (let [auth (db/auth-user "admin" "secretpassword")
+            backup (-> auth (get "auth_key") (db/backup))
+            auth (db/auth-user "username" "password")
+            result (db/import-backup (get auth "auth_key") backup)]
+        (is (not (nil? (:error result)))))
+      (db/drop-database)))
+  (testing "database import works as expected"
+    (do
+      (db/setup-database)
+      (db/create-admin "admin" "secretpassword" test-note)
+      (db/create-user "username" "password" another-test-note)
+      (let [auth (db/auth-user "admin" "secretpassword")
+            auth-key (get auth "auth_key")
+            old-backup (db/backup auth-key)
+            result (db/import-backup auth-key old-backup)
+            new-backup (db/backup auth-key)]
+        (is (= old-backup new-backup))
+        (is (nil? (:error result))))
+      (db/drop-database))))

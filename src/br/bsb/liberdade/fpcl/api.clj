@@ -70,13 +70,20 @@
       (db/backup)
       (boilerplate)))
 
+(defn import-backup [req]
+  (let [params (json/read-str (slurp (:body req)))
+        auth-key (get params "auth_key")
+        backup (get params "backup")]
+    (boilerplate (db/import-backup auth-key backup))))
+
 (defroutes app-routes
   (POST "/users/create" [] create-users)
   (POST "/users/auth" [] auth-users)
   (POST "/users/password" [] update-password)
   (GET "/notes" [] get-notes)
   (POST "/notes" [] post-notes)
-  (GET "/backup" [] export-backup))
+  (GET "/backup" [] export-backup)
+  (POST "/backup" [] import-backup))
 
 ; ###############
 ; # Entry point #
