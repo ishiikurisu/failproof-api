@@ -85,11 +85,22 @@
   (GET "/backup" [] export-backup)
   (POST "/backup" [] import-backup))
 
-; ###############
-; # Entry point #
-; ###############
-(defn -main [& args]
+; ################
+; # Entry points #
+; ################
+(defn- migrate []
+  (do
+    (db/setup-database)))
+
+(defn- run []
   (let [port (Integer/parseInt (or (System/getenv "PORT") "3000"))]
-    (db/setup-database)
     (server/run-server (wrap-cors #'app-routes #".*" (assoc site-defaults :security nil)) {:port port})
     (println (str "Listening at http://localhost:" port "/"))))
+
+
+(defn -main [& args]
+  (do 
+    (when (some #(= "m" %) args)
+      (migrate))
+    (when (nil? args)
+      (run))))
