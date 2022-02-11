@@ -14,7 +14,7 @@
 ; # UTILITIES #
 ; #############
 (defn- boilerplate [body]
-  {:status 200
+  {:status (if (-> body (get :error) (nil?)) 200 500)
    :headers {"Content-Type" "text/json"
              "Access-Control-Allow-Origin" "*"
              "Access-Control-Expose-Headers" "*"}
